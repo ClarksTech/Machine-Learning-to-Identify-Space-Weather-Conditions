@@ -20,11 +20,18 @@ for path in paths:
     measurementTime = dataset['time'][:]    # store entire time data in variable
     print(measurementTime)                  # print variable to confirm data transfer
 
+    # Identify the LEO and PRN satellites used for measurements
+    print(dataset.__dict__['leo_id'])           # print LEO ID
+    print(dataset.__dict__['prn_id'])           # print PRN ID
+    leoId = dataset.__dict__['leo_id']          # Store LEO ID
+    prnId = dataset.__dict__['prn_id']          # Store PRN ID
+
     ####################### Plot TEC against Time #######################
-    plt.plot(measurementTime, TEC)                      # plot GPS measurement time on x axis, TEC on y axis
-    plt.ylabel("TEC along LEO-GPS link (TECU)")         # label y axis
-    plt.xlabel("Time of GPS measurement (GPS Second)")  # label x axis
-    plt.show()                                          # display the plot
+    plt.plot(measurementTime, TEC)                                  # plot GPS measurement time on x axis, TEC on y axis
+    plt.ylabel("TEC along LEO-GPS link (TECU)")                     # label y axis
+    plt.xlabel("Time of GPS measurement (GPS Second)")              # label x axis
+    plt.title(f"TEC plot for PRN ID: {leoId} and LEO ID: {prnId}")  # title with PRN and LEO ID
+    plt.show()                                                      # display the plot
 
 
 
