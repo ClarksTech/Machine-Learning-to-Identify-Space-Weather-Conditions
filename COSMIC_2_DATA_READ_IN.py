@@ -9,7 +9,11 @@ print(ds['TEC'])
 TEC = ds['TEC'][:]
 print(TEC)
 
-plt.plot(TEC)
+print(ds['time'])
+measurementTime = ds['time'][:]
+print(measurementTime)
+
+plt.plot(measurementTime, TEC)
 plt.ylabel("TEC along LEO-GPS link (TECU)")
-plt.xlabel("Measurement Number")
+plt.xlabel("Time of GPS measurement (GPS Second)")
 plt.show()
