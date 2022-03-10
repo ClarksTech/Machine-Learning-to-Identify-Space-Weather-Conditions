@@ -12,6 +12,9 @@ from sympy import timed    # to convert GPS to UTC time
 directoryPath = "C:\\Users\\crutt\\Documents\\University\\Final Year Project\\FYP_Data\\podTc2_postProc_2020_032"   # Directory path containing Data
 paths = Path(directoryPath).glob('**/*.3430_nc')                                                                    # Path for all .3430_nc podTEC files
 
+leoIdArr = []
+prnIdArr = []
+
 # repeat for all files in directory to show variation
 for path in paths:
     dataset = nc.Dataset(path)  # Access the dataset using netCDF4 library tools
@@ -33,6 +36,8 @@ for path in paths:
     print(dataset.__dict__['prn_id'])           # print PRN ID
     leoId = dataset.__dict__['leo_id']          # Store LEO ID
     prnId = dataset.__dict__['prn_id']          # Store PRN ID
+    leoIdArr.append(dataset.__dict__['leo_id'])          # Store LEO ID
+    prnIdArr.append(dataset.__dict__['prn_id'])          # Store PRN ID
 
     ####################### Plot TEC against Time #######################
     plt.plot(utcTime, TEC)                                              # plot GPS measurement time on x axis, TEC on y axis
