@@ -2,9 +2,33 @@
 import netCDF4 as nc                        # dataset is in netCDF format
 import matplotlib.pyplot as plt             # for graphing data to validate its presence 
 from pathlib import Path                    # to iterate over all files in folder
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta    # convert GPS time to UTC time
 
-from sympy import timed    # to convert GPS to UTC time
+#####################################################################
+################## Class to Hold TEC for each LEO ###################
+#####################################################################
+class tecData(object):
+    def __init__(self,leo=None, prn=None, utcTime=None, tec=None):  # define class and parameters
+        self.leo = leo                                              # refrenced to self. for access
+        self.prn = prn              # refrenced to self. for access                                          
+        self.utcTime = utcTime      # refrenced to self. for access
+        self.tec = tec              # refrenced to self. for access
+
+# empty list to store classes for each LEO and PRN
+tecDataList = []
+
+#####################################################################
+####### Count Number of Files to be loaded for progress bar #########
+#####################################################################
+directoryPath = "C:\\Users\\crutt\\Documents\\University\\Final Year Project\\FYP_Data\\podTc2_postProc_2020_032"   # Directory path containing Data
+paths = Path(directoryPath).glob('**/*.3430_nc')                                                                    # Path for all .3430_nc podTEC files
+
+# Progres bar setup
+numPaths = 0
+# increment counter for every path
+for path in paths:
+    numPaths += 1
+print("Number of paths: ", numPaths)    # print total number of files to be loaded
 
 #####################################################################
 #################### Open dataset and access TEC ####################
@@ -12,19 +36,18 @@ from sympy import timed    # to convert GPS to UTC time
 directoryPath = "C:\\Users\\crutt\\Documents\\University\\Final Year Project\\FYP_Data\\podTc2_postProc_2020_032"   # Directory path containing Data
 paths = Path(directoryPath).glob('**/*.3430_nc')                                                                    # Path for all .3430_nc podTEC files
 
-leoIdArr = []
-prnIdArr = []
-
 # repeat for all files in directory to show variation
+progressCount = 0
 for path in paths:
-    dataset = nc.Dataset(path)  # Access the dataset using netCDF4 library tools
-    print(dataset)                  # printing dataset to display all available fields to verify correct podTEC format
-    print(dataset['TEC'])           # print TEC variable to verify the TEC data format
-    TEC = dataset['TEC'][:]         # store the entire TEC data in variable TEC
-    print(TEC)                      # Print variable TEC to confirm data transfer
-    print(dataset['time'])                  # print time variable to verify time format
+
+    # Print Progress
+    print("Progress of Data Import: ", progressCount, "/", numPaths)
+    progressCount += 1
+
+    # Access the data and obtain TEC and measurement time
+    dataset = nc.Dataset(path)              # Access the dataset using netCDF4 library tools
+    tec = dataset['TEC'][:]                 # store the entire TEC data in variable TEC
     measurementTime = dataset['time'][:]    # store entire time data in variable
-    print(measurementTime)                  # print variable to confirm data transfer
 
     # convert GPS time to UTC time
     utcTime = []                    # initialise array to hold utcTime
@@ -32,16 +55,29 @@ for path in paths:
         utcTime.append(datetime(1980, 1, 6) + timedelta(seconds=time - (37 - 19)))  # GPS and UTS initialised 1980,1,6. Add time delta acounting for leapseconds
 
     # Identify the LEO and PRN satellites used for measurements
-    print(dataset.__dict__['leo_id'])           # print LEO ID
-    print(dataset.__dict__['prn_id'])           # print PRN ID
     leoId = dataset.__dict__['leo_id']          # Store LEO ID
     prnId = dataset.__dict__['prn_id']          # Store PRN ID
-    leoIdArr.append(dataset.__dict__['leo_id'])          # Store LEO ID
-    prnIdArr.append(dataset.__dict__['prn_id'])          # Store PRN ID
 
-    ####################### Plot TEC against Time #######################
-    plt.plot(utcTime, TEC)                                              # plot GPS measurement time on x axis, TEC on y axis
-    plt.ylabel("TEC along LEO-GPS link (TECU)")                         # label y axis
-    plt.xlabel(f"UTC Time of Measurement on {utcTime[0].year}/{utcTime[0].month}/{utcTime[0].day}") # label x axis
-    plt.title(f"TEC plot for PRN ID: {leoId} and LEO ID: {prnId}")      # title with PRN and LEO ID
-    plt.show()  
+    tecDataList.append(tecData(leoId, prnId, utcTime, tec)) # Add data extracted to class in data list
+
+# sort list by LEO ID, and then by PRN ID
+tecDataList.sort(key=lambda l: (l.leo, l.prn, l.utcTime[0]))
+
+# plot time vs TEC
+for data in tecDataList:
+    plt.plot(data.utcTime, data.tec)                    # plot time vs TEC
+    plt.ylabel("TEC along LEO-GPS link (TECU)")         # label y axis
+    plt.xlabel(f"UTC Time of Measurement on {data.utcTime[0].year}/{data.utcTime[0].month}/{data.utcTime[0].day}")  # label x axis
+    #plt.title(f"TEC plot for PRN ID: {data.leo} and LEO ID: {data.prn}")                                            # title with PRN and LEO ID
+    plt.title("TEC plot for LEO 1-6 PRN 1-32 for one day")          # title 
+plt.show()
+
+# plot time vs TEC for LEO 1 PRN 1
+for data in tecDataList:
+    if data.leo == 1 and data.prn == 1:
+        plt.plot(data.utcTime, data.tec)                    # plot time vs TEC
+
+plt.ylabel("TEC along LEO-GPS link (TECU)")                 # label y axis
+plt.xlabel(f"UTC Time of Measurement on {data.utcTime[0].year}/{data.utcTime[0].month}/{data.utcTime[0].day}")  # label x axis
+plt.title("TEC plot for LEO 1 PRN 1 for one day")           # title 
+plt.show()
