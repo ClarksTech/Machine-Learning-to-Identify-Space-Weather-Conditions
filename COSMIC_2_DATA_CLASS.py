@@ -63,21 +63,29 @@ for path in paths:
 # sort list by LEO ID, and then by PRN ID
 tecDataList.sort(key=lambda l: (l.leo, l.prn, l.utcTime[0]))
 
+#####################################################################
+################## Display the Extracted Datasets ###################
+#####################################################################
 # plot time vs TEC
 for data in tecDataList:
-    plt.plot(data.utcTime, data.tec)                    # plot time vs TEC
-    plt.ylabel("TEC along LEO-GPS link (TECU)")         # label y axis
+    plt.plot(data.utcTime, data.tec)                            # plot time vs TEC
+    plt.ylabel("TEC along LEO-GPS link (TECU)")                 # label y axis
     plt.xlabel(f"UTC Time of Measurement on {data.utcTime[0].year}/{data.utcTime[0].month}/{data.utcTime[0].day}")  # label x axis
-    #plt.title(f"TEC plot for PRN ID: {data.leo} and LEO ID: {data.prn}")                                            # title with PRN and LEO ID
-    plt.title("TEC plot for LEO 1-6 PRN 1-32 for one day")          # title 
+    plt.title("TEC plot for LEO 1-6 PRN 1-32 for one day")      # title 
 plt.show()
 
-# plot time vs TEC for LEO 1 PRN 1
+# plot time vs TEC for specific LEO and PRN ID
+print("Enter LEO ID to display: ")  # prompt user to enter LEO ID
+displayLeo = int(input())           # capture LEO ID
+print("Enter PRN ID to display: ")  # prompt user to enter PRN ID
+displayPrn = int(input())           # prompt user to enter PRN ID
+
+# search list and only plot if is specified LEO and PRN ID
 for data in tecDataList:
-    if data.leo == 1 and data.prn == 1:
+    if data.leo == displayLeo and data.prn == displayPrn:   # only LEO and PRN ID 
         plt.plot(data.utcTime, data.tec)                    # plot time vs TEC
 
 plt.ylabel("TEC along LEO-GPS link (TECU)")                 # label y axis
 plt.xlabel(f"UTC Time of Measurement on {data.utcTime[0].year}/{data.utcTime[0].month}/{data.utcTime[0].day}")  # label x axis
-plt.title("TEC plot for LEO 1 PRN 1 for one day")           # title 
+plt.title(f"TEC plot for LEO {displayLeo} PRN {displayPrn} for one day")       # title 
 plt.show()
