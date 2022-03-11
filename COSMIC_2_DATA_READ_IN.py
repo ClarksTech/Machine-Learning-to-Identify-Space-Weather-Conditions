@@ -2,9 +2,7 @@
 import netCDF4 as nc                        # dataset is in netCDF format
 import matplotlib.pyplot as plt             # for graphing data to validate its presence 
 from pathlib import Path                    # to iterate over all files in folder
-from datetime import datetime, timedelta
-
-from sympy import timed    # to convert GPS to UTC time
+from datetime import datetime, timedelta    # convert GPS time to UTC time
 
 #####################################################################
 #################### Open dataset and access TEC ####################
