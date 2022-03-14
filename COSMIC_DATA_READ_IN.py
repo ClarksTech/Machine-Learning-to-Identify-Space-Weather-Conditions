@@ -3,16 +3,23 @@ import netCDF4 as nc                        # dataset is in netCDF format
 import matplotlib.pyplot as plt             # for graphing data to validate its presence 
 from pathlib import Path                    # to iterate over all files in folder
 from datetime import datetime, timedelta    # convert GPS time to UTC time
+from pyproj import proj                     # convert ECF to LLA
 
 #####################################################################
 ################## Class to Hold TEC for each LEO ###################
 #####################################################################
 class tecData(object):
-    def __init__(self,leo=None, prn=None, utcTime=None, tec=None):  # define class and parameters
-        self.leo = leo                                              # refrenced to self. for access
-        self.prn = prn              # refrenced to self. for access                                          
-        self.utcTime = utcTime      # refrenced to self. for access
-        self.tec = tec              # refrenced to self. for access
+    def __init__(self,leo=None, prn=None, utcTime=None, tec=None, x=None, y=None, z=None, lat=None, lon=None, alt=None):  # define class and parameters
+        self.leo = leo              # refrenced to self. for access to LEO
+        self.prn = prn              # refrenced to self. for access to PRN                                        
+        self.utcTime = utcTime      # refrenced to self. for access to UTC
+        self.tec = tec              # refrenced to self. for access to TEC
+        self.x = x                  # refrenced to self. for access to ECF X
+        self.y = y                  # refrenced to self. for access to ECF Y
+        self.z = z                  # refrenced to self. for access to ECF Z
+        self.lat = lat              # refrenced to self. for access to latitude
+        self.lon = lon              # refrenced to self. for access to longitude
+        self.alt = alt              # refrenced to self. for access to altitude
 
 #####################################################################
 ####### Count Number of Files to be loaded for progress bar #########
@@ -57,7 +64,11 @@ def importDataToClassList(directoryPath, numPaths):
         leoId = dataset.__dict__['leo_id']          # Store LEO ID
         prnId = dataset.__dict__['prn_id']          # Store PRN ID
 
-        tecDataList.append(tecData(leoId, prnId, utcTime, tec)) # Add data extracted to class in data list
+        ecfX = dataset['x_LEO'][:]
+        ecfY = dataset['y_LEO'][:]
+        ecfZ = dataset['z_LEO'][:]
+
+        tecDataList.append(tecData(leo=leoId, prn=prnId, utcTime=utcTime, tec=tec, x=ecfX, y=ecfY, z=ecfZ)) # Add data extracted to class in data list
 
     # sort list by LEO ID, and then by PRN ID
     tecDataList.sort(key=lambda l: (l.leo, l.prn, l.utcTime[0]))
