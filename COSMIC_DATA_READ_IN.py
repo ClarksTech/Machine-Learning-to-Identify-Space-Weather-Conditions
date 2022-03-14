@@ -81,9 +81,11 @@ def importDataToClassList(directoryPath, numPaths):
             z = ecfZ[pos]*1000  # convert from km to m
 
             # pyproj for conversion from ECF to LLA WGS84 in degrees
-            ecf = pyproj.Proj(proj='geocent', ellps='WGS84', datum='WGS84')
-            lla = pyproj.Proj(proj='latlong', ellps='WGS84', datum='WGS84')
-            lon1, lat1, alt1 = pyproj.transform(ecf, lla, x, y, z, radians=False)   # transform to desired format
+            transformer = pyproj.Transformer.from_crs(
+                {"proj":'geocent', "ellps":'WGS84', "datum":'WGS84'},
+                {"proj":'latlong', "ellps":'WGS84', "datum":'WGS84'}  
+            )
+            lon1, lat1, alt1 = transformer.transform(x, y, z, radians=False)   # transform to desired format
             lat.append(lat1)    # append to lat list
             lon.append(lon1)    # append to lon list
             alt.append(alt1)    # append to alt list
