@@ -3,7 +3,7 @@ import netCDF4 as nc                        # dataset is in netCDF format
 import matplotlib.pyplot as plt             # for graphing data to validate its presence 
 from pathlib import Path                    # to iterate over all files in folder
 from datetime import datetime, timedelta    # convert GPS time to UTC time
-from pyproj import proj                     # convert ECF to LLA
+import pyproj                               # convert ECF to LLA
 
 #####################################################################
 ################## Class to Hold TEC for each LEO ###################
@@ -64,14 +64,36 @@ def importDataToClassList(directoryPath, numPaths):
         leoId = dataset.__dict__['leo_id']          # Store LEO ID
         prnId = dataset.__dict__['prn_id']          # Store PRN ID
 
-        ecfX = dataset['x_LEO'][:]
-        ecfY = dataset['y_LEO'][:]
-        ecfZ = dataset['z_LEO'][:]
+        # Obtain ECF coordinate of each measurement point
+        ecfX = dataset['x_LEO'][:]  # x coordinate
+        ecfY = dataset['y_LEO'][:]  # y coordinate
+        ecfZ = dataset['z_LEO'][:]  # z coordinate
 
-        tecDataList.append(tecData(leo=leoId, prn=prnId, utcTime=utcTime, tec=tec, x=ecfX, y=ecfY, z=ecfZ)) # Add data extracted to class in data list
+        # convert ECEF to Lat Long Alt
+        lat = []    # empty containers for lat
+        lon = []    # empty containers for lon
+        alt = []    # empty container for alt
 
+        # convert every measurement
+        for pos in range(len(ecfX)):
+            x = ecfX[pos]*1000  # convert from km to m
+            y = ecfY[pos]*1000  # convert from km to m
+            z = ecfZ[pos]*1000  # convert from km to m
+
+            # pyproj for conversion from ECF to LLA WGS84 in degrees
+            ecf = pyproj.Proj(proj='geocent', ellps='WGS84', datum='WGS84')
+            lla = pyproj.Proj(proj='latlong', ellps='WGS84', datum='WGS84')
+            lon1, lat1, alt1 = pyproj.transform(ecf, lla, x, y, z, radians=False)   # transform to desired format
+            lat.append(lat1)    # append to lat list
+            lon.append(lon1)    # append to lon list
+            alt.append(alt1)    # append to alt list
+
+        tecDataList.append(tecData(leo=leoId, prn=prnId, utcTime=utcTime, tec=tec, x=ecfX, y=ecfY, z=ecfZ, lat=lat, lon=lon, alt=alt)) # Add data extracted to class in data list
+
+    print("Data Import Complete - Now Sorting Data")
     # sort list by LEO ID, and then by PRN ID
     tecDataList.sort(key=lambda l: (l.leo, l.prn, l.utcTime[0]))
+    print("Data Sort Complete")
     return(tecDataList)
 
 #####################################################################
