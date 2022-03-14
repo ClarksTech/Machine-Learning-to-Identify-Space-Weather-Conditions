@@ -47,9 +47,6 @@ def importDataToClassList(directoryPath, numPaths):
         dataset = nc.Dataset(path)              # Access the dataset using netCDF4 library tools
         tec = dataset['TEC'][:]                 # store the entire TEC data in variable TEC
         measurementTime = dataset['time'][:]    # store entire time data in variable
-        print(measurementTime)
-        displayLeo = int(input())           # capture LEO ID
-
 
         # convert GPS time to UTC time
         utcTime = []                    # initialise array to hold utcTime
