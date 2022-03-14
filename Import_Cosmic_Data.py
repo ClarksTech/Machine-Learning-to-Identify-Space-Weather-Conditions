@@ -1,11 +1,7 @@
 # include the required libraries
 import netCDF4 as nc                        # dataset is in netCDF format
-import matplotlib.pyplot as plt             # for graphing data to validate its presence 
 from pathlib import Path                    # to iterate over all files in folder
 from datetime import datetime, timedelta    # convert GPS time to UTC time
-from mpl_toolkits.basemap import Basemap    # Map for plotting global data
-import numpy as np
-
 
 #####################################################################
 ################## Class to Hold TEC for each LEO ###################
@@ -29,7 +25,7 @@ def getNumFiles(directoryPath):
     # increment counter for every path
     for path in paths:
         numPaths += 1
-    print("Number of paths: ", numPaths)    # print total number of files to be loaded
+    print("Number of Data Files to Import: ", numPaths)    # print total number of files to be loaded
     return (numPaths)
 
 #####################################################################
@@ -45,7 +41,7 @@ def importDataToClassList(directoryPath, numPaths):
     for path in paths:
 
         # Print Progress
-        print("Progress of Data Import: ", progressCount, "/", numPaths)
+        print("Progress of Data Import: ", progressCount, "/", numPaths, end='\r')
         progressCount += 1
 
         # Access the data and obtain TEC and measurement time
@@ -92,61 +88,16 @@ def importDataToClassList(directoryPath, numPaths):
         tecDataList.append(tecData(leo=leoId, prn=prnId, utcTime=utcTime, tec=tec, lat=lat, lon=lon)) # Add data extracted to class in data list
 
     print("Data Import Complete - Now Sorting Data")
+
     # sort list by LEO ID, and then by PRN ID
     tecDataList.sort(key=lambda l: (l.leo, l.prn, l.utcTime[0]))
+    
     print("Data Sort Complete")
-    return(tecDataList)
 
-#####################################################################
-################## Display the Extracted Datasets ###################
-#####################################################################
-
-############################### MAIN ################################
-directoryPath = "C:\\Users\\crutt\\Documents\\University\\Final Year Project\\FYP_Data\\podTc2_postProc_2020_032"   # Directory path containing Data
-
-# Determine number of files to be imported
-numberOfFiles = getNumFiles(directoryPath)
-
-# Import files to Class list for easy data access
-tecDataList = importDataToClassList(directoryPath, numberOfFiles)
-
-print("Drawing World Map of TEC")
-map = Basemap()
-map.drawcoastlines()
-map.drawparallels(np.arange(-90,90,30),labels=[1,1,0,1], fontsize=8)
-map.drawmeridians(np.arange(-180,180,30),labels=[1,1,0,1], rotation=45, fontsize=8)
-for data in tecDataList:
-    map.scatter(data.lon, data.lat, latlon=True, c=data.tec, s=10, cmap='Reds', alpha=0.2)
-plt.colorbar(label='TECU')
-plt.clim(0,600) 
-plt.xlabel('Longitude', labelpad=40, fontsize=8)
-plt.ylabel('Latitude', labelpad=40, fontsize=8) 
-plt.title('COSMIC 2 TEC plot on global map for one day', fontsize=8) 
-plt.show()
+    return(tecDataList)             # return the list of class objects
 
 
 
-# plot time vs TEC
-print("Plotting TEC vs Time")
-for data in tecDataList:
-    plt.plot(data.utcTime, data.tec)                            # plot time vs TEC
-    plt.ylabel("TEC along LEO-GPS link (TECU)")                 # label y axis
-    plt.xlabel(f"UTC Time of Measurement on {data.utcTime[0].year}/{data.utcTime[0].month}/{data.utcTime[0].day}")  # label x axis
-    plt.title("TEC plot for LEO 1-6 PRN 1-32 for one day")      # title 
-plt.show()
 
-# plot time vs TEC for specific LEO and PRN ID
-print("Enter LEO ID to display: ")  # prompt user to enter LEO ID
-displayLeo = int(input())           # capture LEO ID
-print("Enter PRN ID to display: ")  # prompt user to enter PRN ID
-displayPrn = int(input())           # prompt user to enter PRN ID
 
-# search list and only plot if is specified LEO and PRN ID
-for data in tecDataList:
-    if data.leo == displayLeo and data.prn == displayPrn:   # only LEO and PRN ID 
-        plt.plot(data.utcTime, data.tec)                    # plot time vs TEC
 
-plt.ylabel("TEC along LEO-GPS link (TECU)")                 # label y axis
-plt.xlabel(f"UTC Time of Measurement on {data.utcTime[0].year}/{data.utcTime[0].month}/{data.utcTime[0].day}")  # label x axis
-plt.title(f"TEC plot for LEO {displayLeo} PRN {displayPrn} for one day")       # title 
-plt.show()
