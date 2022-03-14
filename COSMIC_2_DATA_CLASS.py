@@ -8,64 +8,105 @@ from datetime import datetime, timedelta    # convert GPS time to UTC time
 ################## Class to Hold TEC for each LEO ###################
 #####################################################################
 class tecData(object):
-    def __init__(self,leo=None, prn=None, utcTime=None, tec=None):  # define class and parameters
-        self.leo = leo                                              # refrenced to self. for access
-        self.prn = prn              # refrenced to self. for access                                          
-        self.utcTime = utcTime      # refrenced to self. for access
-        self.tec = tec              # refrenced to self. for access
-
-# empty list to store classes for each LEO and PRN
-tecDataList = []
+    def __init__(self,leo=None, prn=None, utcTime=None, tec=None, lat=None, lon=None):  # define class and parameters
+        self.leo = leo              # refrenced to self. for access to LEO
+        self.prn = prn              # refrenced to self. for access to PRN                                        
+        self.utcTime = utcTime      # refrenced to self. for access to UTC
+        self.tec = tec              # refrenced to self. for access to TEC
+        self.lat = lat              # refrenced to self. for access to latitude
+        self.lon = lon              # refrenced to self. for access to longitude
 
 #####################################################################
 ####### Count Number of Files to be loaded for progress bar #########
 #####################################################################
-directoryPath = "C:\\Users\\crutt\\Documents\\University\\Final Year Project\\FYP_Data\\podTc2_postProc_2020_032"   # Directory path containing Data
-paths = Path(directoryPath).glob('**/*.3430_nc')                                                                    # Path for all .3430_nc podTEC files
-
-# Progres bar setup
-numPaths = 0
-# increment counter for every path
-for path in paths:
-    numPaths += 1
-print("Number of paths: ", numPaths)    # print total number of files to be loaded
+def getNumFiles(directoryPath):
+    paths = Path(directoryPath).glob('**/*.3430_nc')                                                                    # Path for all .3430_nc podTEC files
+    # Progres bar setup
+    numPaths = 0
+    # increment counter for every path
+    for path in paths:
+        numPaths += 1
+    print("Number of paths: ", numPaths)    # print total number of files to be loaded
+    return (numPaths)
 
 #####################################################################
 #################### Open dataset and access TEC ####################
 #####################################################################
-directoryPath = "C:\\Users\\crutt\\Documents\\University\\Final Year Project\\FYP_Data\\podTc2_postProc_2020_032"   # Directory path containing Data
-paths = Path(directoryPath).glob('**/*.3430_nc')                                                                    # Path for all .3430_nc podTEC files
+def importDataToClassList(directoryPath, numPaths):
+    # empty list to store classes for each LEO and PRN
+    tecDataList = []
+    paths = Path(directoryPath).glob('**/*.3430_nc')                                                                    # Path for all .3430_nc podTEC files
 
-# repeat for all files in directory to show variation
-progressCount = 0
-for path in paths:
+    # repeat for all files in directory to show variation
+    progressCount = 0
+    for path in paths:
 
-    # Print Progress
-    print("Progress of Data Import: ", progressCount, "/", numPaths)
-    progressCount += 1
+        # Print Progress
+        print("Progress of Data Import: ", progressCount, "/", numPaths)
+        progressCount += 1
 
-    # Access the data and obtain TEC and measurement time
-    dataset = nc.Dataset(path)              # Access the dataset using netCDF4 library tools
-    tec = dataset['TEC'][:]                 # store the entire TEC data in variable TEC
-    measurementTime = dataset['time'][:]    # store entire time data in variable
+        # Access the data and obtain TEC and measurement time
+        dataset = nc.Dataset(path)              # Access the dataset using netCDF4 library tools
+        tec = dataset['TEC'][:]                 # store the entire TEC data in variable TEC
+        measurementTime = dataset['time'][:]    # store entire time data in variable
 
-    # convert GPS time to UTC time
-    utcTime = []                    # initialise array to hold utcTime
-    for time in measurementTime:    # convert every measurement
-        utcTime.append(datetime(1980, 1, 6) + timedelta(seconds=time - (37 - 19)))  # GPS and UTS initialised 1980,1,6. Add time delta acounting for leapseconds
+        # convert GPS time to UTC time
+        utcTime = []                    # initialise array to hold utcTime
+        for time in measurementTime:    # convert every measurement
+            utcTime.append(datetime(1980, 1, 6) + timedelta(seconds=time - (37 - 19)))  # GPS and UTS initialised 1980,1,6. Add time delta acounting for leapseconds
 
-    # Identify the LEO and PRN satellites used for measurements
-    leoId = dataset.__dict__['leo_id']          # Store LEO ID
-    prnId = dataset.__dict__['prn_id']          # Store PRN ID
+        # Identify the LEO and PRN satellites used for measurements
+        leoId = dataset.__dict__['leo_id']          # Store LEO ID
+        prnId = dataset.__dict__['prn_id']          # Store PRN ID
 
-    tecDataList.append(tecData(leoId, prnId, utcTime, tec)) # Add data extracted to class in data list
+        # Calculate Lat and Lon of each measurement
+        lat = []    # empty array to store lat 
+        lon = []    # empty array to store lon
 
-# sort list by LEO ID, and then by PRN ID
-tecDataList.sort(key=lambda l: (l.leo, l.prn, l.utcTime[0]))
+        # get all required fields from PodTec data to extrapolate lat and lon at given time
+        latStart = dataset.__dict__['lat_start']        # start latitude for measurement set   
+        lonStart = dataset.__dict__['lon_start']        # start longitude for measurement set          
+        latStop = dataset.__dict__['lat_stop']          # stop latitude for measurement set     
+        lonStop = dataset.__dict__['lon_stop']          # stop longitude for measurement set 
+        timeStart = dataset.__dict__['start_time']      # start time (GPS) for measurement set 
+        timeStop = dataset.__dict__['stop_time']        # stop time (GPS) for measurement set 
+
+        # calculate difference between start and stop lat, lon, time
+        timeDiff = timeStop - timeStart     # time diff from start to end
+        latDiff = latStop - latStart        # lat diff from start to end
+        lonDiff = lonStop - lonStart        # lon diff from start to end
+
+        # for every measurement point determine percentage through arc and apply corrective measurement to lat and lon
+        for time in measurementTime:
+            measurementTimeDiff = time - timeStart                          # difference of measurement time from start time
+            extrapolatedLatDiff = (measurementTimeDiff/timeDiff)*latDiff    # percentage through arc*lat diff to give proposed lat movement
+            extrapolatedLonDiff = (measurementTimeDiff/timeDiff)*lonDiff    # percentage through arc*lon diff to give proposed lon movement
+            extrapolatedLat = latStart + extrapolatedLatDiff                # measurement extrapolated lat by adding proposed diff to start
+            extrapolatedLon = lonStart + extrapolatedLonDiff                # measurement extrapolated lon by adding proposed diff to start
+            lat.append(extrapolatedLat)                                     # Add final lat to array
+            lon.append(extrapolatedLon)                                     # Add final lon to array
+
+        tecDataList.append(tecData(leo=leoId, prn=prnId, utcTime=utcTime, tec=tec, lat=lat, lon=lon)) # Add data extracted to class in data list
+
+    print("Data Import Complete - Now Sorting Data")
+    # sort list by LEO ID, and then by PRN ID
+    tecDataList.sort(key=lambda l: (l.leo, l.prn, l.utcTime[0]))
+    print("Data Sort Complete")
+    return(tecDataList)
 
 #####################################################################
 ################## Display the Extracted Datasets ###################
 #####################################################################
+
+############################### MAIN ################################
+directoryPath = "C:\\Users\\crutt\\Documents\\University\\Final Year Project\\FYP_Data\\podTc2_postProc_2020_032"   # Directory path containing Data
+
+# Determine number of files to be imported
+numberOfFiles = getNumFiles(directoryPath)
+
+# Import files to Class list for easy data access
+tecDataList = importDataToClassList(directoryPath, numberOfFiles)
+
 # plot time vs TEC
 for data in tecDataList:
     plt.plot(data.utcTime, data.tec)                            # plot time vs TEC
