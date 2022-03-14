@@ -3,6 +3,9 @@ import netCDF4 as nc                        # dataset is in netCDF format
 import matplotlib.pyplot as plt             # for graphing data to validate its presence 
 from pathlib import Path                    # to iterate over all files in folder
 from datetime import datetime, timedelta    # convert GPS time to UTC time
+from mpl_toolkits.basemap import Basemap    # Map for plotting global data
+import numpy as np
+
 
 #####################################################################
 ################## Class to Hold TEC for each LEO ###################
@@ -107,7 +110,24 @@ numberOfFiles = getNumFiles(directoryPath)
 # Import files to Class list for easy data access
 tecDataList = importDataToClassList(directoryPath, numberOfFiles)
 
+print("Drawing World Map of TEC")
+map = Basemap()
+map.drawcoastlines()
+map.drawparallels(np.arange(-90,90,30),labels=[1,1,0,1], fontsize=8)
+map.drawmeridians(np.arange(-180,180,30),labels=[1,1,0,1], rotation=45, fontsize=8)
+for data in tecDataList:
+    map.scatter(data.lon, data.lat, latlon=True, c=data.tec, s=10, cmap='Reds', alpha=0.2)
+plt.colorbar(label='TECU')
+plt.clim(0,600) 
+plt.xlabel('Longitude', labelpad=40, fontsize=8)
+plt.ylabel('Latitude', labelpad=40, fontsize=8) 
+plt.title('COSMIC 2 TEC plot on global map for one day', fontsize=8) 
+plt.show()
+
+
+
 # plot time vs TEC
+print("Plotting TEC vs Time")
 for data in tecDataList:
     plt.plot(data.utcTime, data.tec)                            # plot time vs TEC
     plt.ylabel("TEC along LEO-GPS link (TECU)")                 # label y axis
