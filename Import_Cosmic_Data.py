@@ -2,16 +2,18 @@
 import netCDF4 as nc                        # dataset is in netCDF format
 from pathlib import Path                    # to iterate over all files in folder
 from datetime import datetime, timedelta    # convert GPS time to UTC time
+import numpy as np                          # to find TEC DIFF
 
 #####################################################################
 ################## Class to Hold TEC for each LEO ###################
 #####################################################################
 class tecData(object):
-    def __init__(self,leo=None, prn=None, utcTime=None, tec=None, lat=None, lon=None):  # define class and parameters
+    def __init__(self,leo=None, prn=None, utcTime=None, tec=None, tecDiff=None, lat=None, lon=None):  # define class and parameters
         self.leo = leo              # refrenced to self. for access to LEO
         self.prn = prn              # refrenced to self. for access to PRN                                        
         self.utcTime = utcTime      # refrenced to self. for access to UTC
         self.tec = tec              # refrenced to self. for access to TEC
+        self.tecDiff = tecDiff      # refrenced to self. for access to TEC Diff
         self.lat = lat              # refrenced to self. for access to latitude
         self.lon = lon              # refrenced to self. for access to longitude
 
@@ -85,7 +87,11 @@ def importDataToClassList(directoryPath, numPaths):
             lat.append(extrapolatedLat)                                     # Add final lat to array
             lon.append(extrapolatedLon)                                     # Add final lon to array
 
-        tecDataList.append(tecData(leo=leoId, prn=prnId, utcTime=utcTime, tec=tec, lat=lat, lon=lon)) # Add data extracted to class in data list
+        # Calculate the TEC difference between measurements
+        tempTecArr = np.array(tec)        # create temp array to avoid altering TEC array
+        tecDiff = np.diff(tempTecArr)   # find the diff between consecutive values of TEC
+
+        tecDataList.append(tecData(leo=leoId, prn=prnId, utcTime=utcTime, tec=tec, tecDiff=tecDiff, lat=lat, lon=lon)) # Add data extracted to class in data list
 
     print("Data Import Complete - Now Sorting Data")
 
