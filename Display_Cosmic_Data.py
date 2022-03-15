@@ -25,6 +25,27 @@ def displayTecWorldMap(tecDataList):
     return()
 
 #####################################################################
+############ Function to display TEC Diff on World Map ##############
+#####################################################################
+def displayTecDiffWorldMap(tecDataList):
+    print("Drawing World Map of TEC Diff")
+    map = Basemap()                                                                             # Using basemap as basis for world map
+    map.drawcoastlines()                                                                        # Only add the costal lines to the map for visual refrence
+    map.drawparallels(np.arange(-90,90,30),labels=[1,1,0,1], fontsize=8)                        # Add Longitude lines and degree labels
+    map.drawmeridians(np.arange(-180,180,30),labels=[1,1,0,1], rotation=45, fontsize=8)         # Add latitude lines and degree labels
+
+    # repeat for every TEC measurement for entire day
+    for data in tecDataList:
+        map.scatter(data.lon, data.lat, latlon=True, c=data.tecDiff, s=10, cmap='RdBu_r', alpha=0.2)  # Plot as a scatter where shade of red depends on TEC Diff value
+    plt.colorbar(label='TECU Diff')                                                                 # Add coloutbar key for TECu Shades of red
+    plt.clim(-60,60)                                                                                # Key from 0 to 1000 (max TEC Diff measurement ~+-50)
+    plt.xlabel('Longitude', labelpad=40, fontsize=8)                                                # Add x axis label
+    plt.ylabel('Latitude', labelpad=40, fontsize=8)                                                 # Add y axis label
+    plt.title('COSMIC 2 TEC Diff plot on global map for one day', fontsize=8)                       # Add title
+    plt.show()
+    return()
+
+#####################################################################
 ############### Function to display TEC vs UTC time #################
 #####################################################################
 def displayTecVsUtc(tecDataList):
@@ -35,6 +56,20 @@ def displayTecVsUtc(tecDataList):
         plt.ylabel("TEC along LEO-GPS link (TECU)")                 # label y axis
         plt.xlabel(f"UTC Time of Measurement on {data.utcTime[0].year}/{data.utcTime[0].month}/{data.utcTime[0].day}")  # label x axis
         plt.title("TEC plot for LEO 1-6 PRN 1-32 for one day")      # title 
+    plt.show()
+    return()
+
+#####################################################################
+############ Function to display TEC Diff vs UTC time ###############
+#####################################################################
+def displayTecDiffVsUtc(tecDataList):
+    # plot time vs TEC
+    print("Plotting TEC Diff vs Time")
+    for data in tecDataList:
+        plt.plot(data.utcTime, data.tecDiff)                        # plot time vs TEC
+        plt.ylabel("TEC Diff along LEO-GPS link (TECU)")            # label y axis
+        plt.xlabel(f"UTC Time of Measurement on {data.utcTime[0].year}/{data.utcTime[0].month}/{data.utcTime[0].day}")  # label x axis
+        plt.title("TEC Diff plot for LEO 1-6 PRN 1-32 for one day")      # title 
     plt.show()
     return()
 
@@ -58,3 +93,4 @@ def displayTecVsUtcSpecific(tecDataList):
     plt.title(f"TEC plot for LEO {displayLeo} PRN {displayPrn} for one day")                                        # title 
     plt.show()
     return()
+

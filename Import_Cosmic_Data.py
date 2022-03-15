@@ -88,8 +88,9 @@ def importDataToClassList(directoryPath, numPaths):
             lon.append(extrapolatedLon)                                     # Add final lon to array
 
         # Calculate the TEC difference between measurements
-        tempTecArr = np.array(tec)        # create temp array to avoid altering TEC array
-        tecDiff = np.diff(tempTecArr)   # find the diff between consecutive values of TEC
+        tempTecArr = np.array(tec)          # create temp array to avoid altering TEC array
+        tecDiff = np.diff(tempTecArr)       # find the diff between consecutive values of TEC
+        tecDiff = np.append(tecDiff, [0])   # to ensure remains same length as time arrays
 
         tecDataList.append(tecData(leo=leoId, prn=prnId, utcTime=utcTime, tec=tec, tecDiff=tecDiff, lat=lat, lon=lon)) # Add data extracted to class in data list
 

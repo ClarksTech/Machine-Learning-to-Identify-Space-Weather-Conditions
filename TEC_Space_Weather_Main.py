@@ -17,6 +17,12 @@ numberOfFiles = Data.getNumFiles(directoryPath)
 # Import files to Class list for easy data access
 tecDataList = Data.importDataToClassList(directoryPath, numberOfFiles)
 
+# Display TEC Diff vs UTC time
+Display.displayTecDiffVsUtc(tecDataList)
+
+# Display TEC Diff measurements on world map
+Display.displayTecDiffWorldMap(tecDataList)
+
 # Display TEC measurements on world map
 Display.displayTecWorldMap(tecDataList)
 
