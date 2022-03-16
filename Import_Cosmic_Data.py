@@ -3,6 +3,7 @@ import netCDF4 as nc                        # dataset is in netCDF format
 from pathlib import Path                    # to iterate over all files in folder
 from datetime import datetime, timedelta    # convert GPS time to UTC time
 import numpy as np                          # to find TEC DIFF
+import pymap3d as pm
 
 #####################################################################
 ################## Class to Hold TEC for each LEO ###################
@@ -60,32 +61,13 @@ def importDataToClassList(directoryPath, numPaths):
         leoId = dataset.__dict__['leo_id']          # Store LEO ID
         prnId = dataset.__dict__['prn_id']          # Store PRN ID
 
-        # Calculate Lat and Lon of each measurement
-        lat = []    # empty array to store lat 
-        lon = []    # empty array to store lon
+        # get LEO satellite ECEF coordinate converting to metres
+        leoX = np.array(dataset['x_LEO'][:]) * 1000     # store the entire TEC data in variable TEC
+        leoY = np.array(dataset['y_LEO'][:]) * 1000     # store the entire TEC data in variable TEC
+        leoZ = np.array(dataset['z_LEO'][:]) * 1000     # store the entire TEC data in variable TEC
 
-        # get all required fields from PodTec data to extrapolate lat and lon at given time
-        latStart = dataset.__dict__['lat_start']        # start latitude for measurement set   
-        lonStart = dataset.__dict__['lon_start']        # start longitude for measurement set          
-        latStop = dataset.__dict__['lat_stop']          # stop latitude for measurement set     
-        lonStop = dataset.__dict__['lon_stop']          # stop longitude for measurement set 
-        timeStart = dataset.__dict__['start_time']      # start time (GPS) for measurement set 
-        timeStop = dataset.__dict__['stop_time']        # stop time (GPS) for measurement set 
-
-        # calculate difference between start and stop lat, lon, time
-        timeDiff = timeStop - timeStart     # time diff from start to end
-        latDiff = latStop - latStart        # lat diff from start to end
-        lonDiff = lonStop - lonStart        # lon diff from start to end
-
-        # for every measurement point determine percentage through arc and apply corrective measurement to lat and lon
-        for time in measurementTime:
-            measurementTimeDiff = time - timeStart                          # difference of measurement time from start time
-            extrapolatedLatDiff = (measurementTimeDiff/timeDiff)*latDiff    # percentage through arc*lat diff to give proposed lat movement
-            extrapolatedLonDiff = (measurementTimeDiff/timeDiff)*lonDiff    # percentage through arc*lon diff to give proposed lon movement
-            extrapolatedLat = latStart + extrapolatedLatDiff                # measurement extrapolated lat by adding proposed diff to start
-            extrapolatedLon = lonStart + extrapolatedLonDiff                # measurement extrapolated lon by adding proposed diff to start
-            lat.append(extrapolatedLat)                                     # Add final lat to array
-            lon.append(extrapolatedLon)                                     # Add final lon to array
+        # convert to LLA
+        lat, lon, alt = pm.ecef2geodetic(leoX, leoY, leoZ, ell=None, deg=True)
 
         # Calculate the TEC difference between measurements
         tempTecArr = np.array(tec)          # create temp array to avoid altering TEC array

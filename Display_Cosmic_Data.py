@@ -37,7 +37,7 @@ def displayTecDiffWorldMap(tecDataList):
     # repeat for every TEC measurement for entire day
     for data in tecDataList:
         map.scatter(data.lon, data.lat, latlon=True, c=data.tecDiff, s=10, cmap='RdBu_r', alpha=0.2)  # Plot as a scatter where shade of red depends on TEC Diff value
-    plt.colorbar(label='TECU Diff')                                                                 # Add coloutbar key for TECu Shades of red
+    plt.colorbar(label='TECU per Second')                                                                 # Add coloutbar key for TECu Shades of red
     plt.clim(-60,60)                                                                                # Key from 0 to 1000 (max TEC Diff measurement ~+-50)
     plt.xlabel('Longitude', labelpad=40, fontsize=8)                                                # Add x axis label
     plt.ylabel('Latitude', labelpad=40, fontsize=8)                                                 # Add y axis label
@@ -67,7 +67,7 @@ def displayTecDiffVsUtc(tecDataList):
     print("Plotting TEC Diff vs Time")
     for data in tecDataList:
         plt.plot(data.utcTime, data.tecDiff)                        # plot time vs TEC
-        plt.ylabel("TEC Diff along LEO-GPS link (TECU)")            # label y axis
+        plt.ylabel("TEC Diff along LEO-GPS link (TECU per Second)")            # label y axis
         plt.xlabel(f"UTC Time of Measurement on {data.utcTime[0].year}/{data.utcTime[0].month}/{data.utcTime[0].day}")  # label x axis
         plt.title("TEC Diff plot for LEO 1-6 PRN 1-32 for one day")      # title 
     plt.show()
