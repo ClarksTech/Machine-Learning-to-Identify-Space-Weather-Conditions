@@ -72,9 +72,15 @@ def importDataToClassList(directoryPath, numPaths):
         lat, lon, alt = pm.ecef2geodetic(leoX, leoY, leoZ, ell=None, deg=True)
 
         # Calculate the TEC difference between measurements
-        tempTecArr = np.array(tec)          # create temp array to avoid altering TEC array
-        tecDiff = np.diff(tempTecArr)       # find the diff between consecutive values of TEC
-        tecDiff = np.append(tecDiff, [0])   # to ensure remains same length as time arrays
+        tempTecArr = np.array(tec)  # create temp array to avoid altering TEC array
+        tecDiff = []                # create empty array to hold the tec differences
+        # repeat for all tec values excluding last as is no next value to difference off
+        for i in range(len(tempTecArr)-1):
+            timeDif = measurementTime[i+1]-measurementTime[i]   # calculated time difference between TEC measurements
+            tecDif = tempTecArr[i+1]-tempTecArr[i]              # calculate TEC difference between measuremnts
+            tecDifferenceSecond = tecDif/timeDif                # calculate diff as change in TEC over change in time so is TECu per Second
+            tecDiff.append(tecDifferenceSecond)                 # append to empty container
+        tecDiff = np.append(tecDiff, [0])                       # to ensure remains same length as time arrays for plots add 0 to end of array
 
         tecDataList.append(tecData(leo=leoId, prn=prnId, antId=antennaId, utcTime=utcTime, tec=tec, tecDiff=tecDiff, lat=lat, lon=lon)) # Add data extracted to class in data list
 
