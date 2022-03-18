@@ -22,7 +22,7 @@ print("identifying large TEC DIFF...")
 for data in tecDataList:
     for tDiff in data.tecDiff:
         if abs(tDiff) > 20:
-            print("Large TEC diff of ", tDiff, " LEO ID: ", data.leo, " PRN ID: ", data.prn, " Time: ", data.utcTime)
+            print("Large TEC diff of ", tDiff, " LEO ID: ", data.leo, " PRN ID: ", data.prn)
 
 while(1):
     # Display TEC vs UTC time for specific PRN and LEO ID

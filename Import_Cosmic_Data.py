@@ -49,9 +49,9 @@ def importDataToClassList(directoryPath, numPaths):
         progressCount += 1
 
         # Access the data and obtain TEC and measurement time
-        dataset = nc.Dataset(path)              # Access the dataset using netCDF4 library tools
-        tec = dataset['TEC'][:]                 # store the entire TEC data in variable TEC
-        measurementTime = dataset['time'][:]    # store entire time data in variable
+        dataset = nc.Dataset(path)                      # Access the dataset using netCDF4 library tools
+        tec = np.array(dataset['TEC'][:])               # store the entire TEC data in variable TEC
+        measurementTime = np.array(dataset['time'][:])  # store entire time data in variable
 
         # convert GPS time to UTC time
         utcTime = []                    # initialise array to hold utcTime
