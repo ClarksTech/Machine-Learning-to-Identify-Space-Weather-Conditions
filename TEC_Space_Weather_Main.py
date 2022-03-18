@@ -24,6 +24,15 @@ tecDataList = Data.importDataToClassList(directoryPath, numberOfFiles)
 #        if abs(tDiff) > 20:
 #            print("Large TEC diff of ", tDiff, " LEO ID: ", data.leo, " PRN ID: ", data.prn)
 
+## Find out how many points populate a 30 deg by 30 deg square
+#print("Calculating how many datapoints in 30 by 30 degree square...")
+#count = 0
+#for data in tecDataList:
+#    for i in range(len(data.lat)):
+#        if 0 <= data.lat[i] <= 15 and 0 <= data.lon[i] <= 15 :
+#            count += 1
+#print("Data Points in a 30 by 30 degree square = ", count)
+
 # Display TEC Diff vs UTC time
 Display.displayTecDiffVsUtc(tecDataList)
 
