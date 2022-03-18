@@ -38,7 +38,7 @@ def displayTecDiffWorldMap(tecDataList):
     for data in tecDataList:
         map.scatter(data.lon, data.lat, latlon=True, c=data.tecDiff, s=10, cmap='RdBu_r', alpha=0.2)  # Plot as a scatter where shade of red depends on TEC Diff value
     plt.colorbar(label='TECU per Second')                                                                 # Add coloutbar key for TECu Shades of red
-    plt.clim(-60,60)                                                                                # Key from 0 to 1000 (max TEC Diff measurement ~+-50)
+    plt.clim(-10,10)                                                                                # Key from 0 to 1000 (max TEC Diff measurement ~+-50)
     plt.xlabel('Longitude', labelpad=40, fontsize=8)                                                # Add x axis label
     plt.ylabel('Latitude', labelpad=40, fontsize=8)                                                 # Add y axis label
     plt.title('COSMIC 2 TEC Diff plot on global map for one day', fontsize=8)                       # Add title
