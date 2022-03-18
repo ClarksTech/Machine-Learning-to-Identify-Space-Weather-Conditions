@@ -74,20 +74,6 @@ def displayTecDiffVsUtc(tecDataList):
     return()
 
 #####################################################################
-####### Function to display TEC Diff vs UTC time anotated ###########
-#####################################################################
-def displayTecDiffVsUtc(tecDataList):
-    # plot time vs TEC
-    print("Plotting TEC Diff vs Time")
-    for data in tecDataList:
-        plt.plot(data.utcTime, data.tecDiff)                            # plot time vs TEC
-        plt.ylabel("TEC Diff along LEO-GPS link (TECU per Second)")     # label y axis
-        plt.xlabel(f"UTC Time of Measurement on {data.utcTime[0].year}/{data.utcTime[0].month}/{data.utcTime[0].day}")  # label x axis
-        plt.title("TEC Diff plot for LEO 1-6 PRN 1-32 for one day")     # title 
-    plt.show()
-    return()
-
-#####################################################################
 ######### Function to display TEC vs UTC time (specific) ############
 #####################################################################
 def displayTecVsUtcSpecific(tecDataList):
