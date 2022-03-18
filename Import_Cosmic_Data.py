@@ -9,9 +9,10 @@ import pymap3d as pm
 ################## Class to Hold TEC for each LEO ###################
 #####################################################################
 class tecData(object):
-    def __init__(self,leo=None, prn=None, utcTime=None, tec=None, tecDiff=None, lat=None, lon=None):  # define class and parameters
+    def __init__(self,leo=None, prn=None, antId=None, utcTime=None, tec=None, tecDiff=None, lat=None, lon=None):  # define class and parameters
         self.leo = leo              # refrenced to self. for access to LEO
-        self.prn = prn              # refrenced to self. for access to PRN                                        
+        self.prn = prn              # refrenced to self. for access to PRN  
+        self.antId = antId          # refrenced to self. for access to antenna ID                              
         self.utcTime = utcTime      # refrenced to self. for access to UTC
         self.tec = tec              # refrenced to self. for access to TEC
         self.tecDiff = tecDiff      # refrenced to self. for access to TEC Diff
@@ -37,7 +38,7 @@ def getNumFiles(directoryPath):
 def importDataToClassList(directoryPath, numPaths):
     # empty list to store classes for each LEO and PRN
     tecDataList = []
-    paths = Path(directoryPath).glob('**/*.3430_nc')                                                                    # Path for all .3430_nc podTEC files
+    paths = Path(directoryPath).glob('**/*.3430_nc')    # Path for all .3430_nc podTEC files
 
     # repeat for all files in directory to show variation
     progressCount = 0
@@ -60,6 +61,7 @@ def importDataToClassList(directoryPath, numPaths):
         # Identify the LEO and PRN satellites used for measurements
         leoId = dataset.__dict__['leo_id']          # Store LEO ID
         prnId = dataset.__dict__['prn_id']          # Store PRN ID
+        antennaId = dataset.__dict__['antenna_id']  # Store Antenna ID
 
         # get LEO satellite ECEF coordinate converting to metres
         leoX = np.array(dataset['x_LEO'][:]) * 1000     # store the entire TEC data in variable TEC
@@ -74,7 +76,7 @@ def importDataToClassList(directoryPath, numPaths):
         tecDiff = np.diff(tempTecArr)       # find the diff between consecutive values of TEC
         tecDiff = np.append(tecDiff, [0])   # to ensure remains same length as time arrays
 
-        tecDataList.append(tecData(leo=leoId, prn=prnId, utcTime=utcTime, tec=tec, tecDiff=tecDiff, lat=lat, lon=lon)) # Add data extracted to class in data list
+        tecDataList.append(tecData(leo=leoId, prn=prnId, antId=antennaId, utcTime=utcTime, tec=tec, tecDiff=tecDiff, lat=lat, lon=lon)) # Add data extracted to class in data list
 
     print("Data Import Complete - Now Sorting Data")
 

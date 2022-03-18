@@ -66,10 +66,24 @@ def displayTecDiffVsUtc(tecDataList):
     # plot time vs TEC
     print("Plotting TEC Diff vs Time")
     for data in tecDataList:
-        plt.plot(data.utcTime, data.tecDiff)                        # plot time vs TEC
-        plt.ylabel("TEC Diff along LEO-GPS link (TECU per Second)")            # label y axis
+        plt.plot(data.utcTime, data.tecDiff)                            # plot time vs TEC
+        plt.ylabel("TEC Diff along LEO-GPS link (TECU per Second)")     # label y axis
         plt.xlabel(f"UTC Time of Measurement on {data.utcTime[0].year}/{data.utcTime[0].month}/{data.utcTime[0].day}")  # label x axis
-        plt.title("TEC Diff plot for LEO 1-6 PRN 1-32 for one day")      # title 
+        plt.title("TEC Diff plot for LEO 1-6 PRN 1-32 for one day")     # title 
+    plt.show()
+    return()
+
+#####################################################################
+####### Function to display TEC Diff vs UTC time anotated ###########
+#####################################################################
+def displayTecDiffVsUtc(tecDataList):
+    # plot time vs TEC
+    print("Plotting TEC Diff vs Time")
+    for data in tecDataList:
+        plt.plot(data.utcTime, data.tecDiff)                            # plot time vs TEC
+        plt.ylabel("TEC Diff along LEO-GPS link (TECU per Second)")     # label y axis
+        plt.xlabel(f"UTC Time of Measurement on {data.utcTime[0].year}/{data.utcTime[0].month}/{data.utcTime[0].day}")  # label x axis
+        plt.title("TEC Diff plot for LEO 1-6 PRN 1-32 for one day")     # title 
     plt.show()
     return()
 
@@ -78,19 +92,40 @@ def displayTecDiffVsUtc(tecDataList):
 #####################################################################
 def displayTecVsUtcSpecific(tecDataList):
     # plot time vs TEC for specific LEO and PRN ID
-    print("Enter LEO ID to display: ")  # prompt user to enter LEO ID
-    displayLeo = int(input())           # capture LEO ID
-    print("Enter PRN ID to display: ")  # prompt user to enter PRN ID
-    displayPrn = int(input())           # prompt user to enter PRN ID
+    print("Enter LEO ID to display: ")      # prompt user to enter LEO ID
+    displayLeo = int(input())               # capture LEO ID
+    print("Enter PRN ID to display: ")      # prompt user to enter PRN ID
+    displayPrn = int(input())               # prompt user to enter PRN ID
 
     # search list and only plot if is specified LEO and PRN ID
     for data in tecDataList:
-        if data.leo == displayLeo and data.prn == displayPrn:   # only LEO and PRN ID 
-            plt.plot(data.utcTime, data.tec)                    # plot time vs TEC
+        if data.leo == displayLeo and data.prn == displayPrn:  # only LEO and PRN ID for given antenna to avoid double readings
+            plt.plot(data.utcTime, data.tec)                   # plot time vs TEC
 
     plt.ylabel("TEC along LEO-GPS link (TECU)")                                                                     # label y axis
     plt.xlabel(f"UTC Time of Measurement on {data.utcTime[0].year}/{data.utcTime[0].month}/{data.utcTime[0].day}")  # label x axis
     plt.title(f"TEC plot for LEO {displayLeo} PRN {displayPrn} for one day")                                        # title 
+    plt.show()
+    return()
+
+#####################################################################
+####### Function to display TEC Diff vs UTC time (specific) #########
+#####################################################################
+def displayTecDiffVsUtcSpecific(tecDataList):
+    # plot time vs TEC Diff for specific LEO and PRN ID
+    print("Enter LEO ID to display: ")      # prompt user to enter LEO ID
+    displayLeo = int(input())               # capture LEO ID
+    print("Enter PRN ID to display: ")      # prompt user to enter PRN ID
+    displayPrn = int(input())               # prompt user to enter PRN ID
+
+    # search list and only plot if is specified LEO and PRN ID
+    for data in tecDataList:
+        if data.leo == displayLeo and data.prn == displayPrn:  # only LEO and PRN ID for given antenna to avoid double readings
+            plt.plot(data.utcTime, data.tecDiff)               # plot time vs TEC Diff
+
+    plt.ylabel("TEC Diff along LEO-GPS link (TECU/S)")                                                              # label y axis
+    plt.xlabel(f"UTC Time of Measurement on {data.utcTime[0].year}/{data.utcTime[0].month}/{data.utcTime[0].day}")  # label x axis
+    plt.title(f"TEC Diff plot for LEO {displayLeo} PRN {displayPrn} for one day")                                   # title 
     plt.show()
     return()
 
