@@ -45,7 +45,8 @@ def importDataToClassList(directoryPath, numPaths):
     for path in paths:
 
         # Print Progress
-        print("Progress of Data Import: ", progressCount, "/", numPaths, end='\r')
+        progress = progressCount/numPaths * 100
+        print("Progress of Data Import: %.2f" %progress, "%",end='\r')
         progressCount += 1
 
         # Access the data and obtain TEC and measurement time
