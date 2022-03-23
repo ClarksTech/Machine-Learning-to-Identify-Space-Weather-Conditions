@@ -9,7 +9,7 @@ import pymap3d as pm
 ################## Class to Hold TEC for each LEO ###################
 #####################################################################
 class tecData(object):
-    def __init__(self,leo=None, prn=None, antId=None, utcTime=None, tec=None, tecDiff=None, lat=None, lon=None):  # define class and parameters
+    def __init__(self,leo=None, prn=None, antId=None, utcTime=None, tec=None, tecDiff=None, lat=None, lon=None, elev=None):  # define class and parameters
         self.leo = leo              # refrenced to self. for access to LEO
         self.prn = prn              # refrenced to self. for access to PRN  
         self.antId = antId          # refrenced to self. for access to antenna ID                              
@@ -18,6 +18,7 @@ class tecData(object):
         self.tecDiff = tecDiff      # refrenced to self. for access to TEC Diff
         self.lat = lat              # refrenced to self. for access to latitude
         self.lon = lon              # refrenced to self. for access to longitude
+        self.elev = elev            # refrenced to self. for access to elevation angle
 
 #####################################################################
 ####### Count Number of Files to be loaded for progress bar #########
@@ -69,6 +70,9 @@ def importDataToClassList(directoryPath, numPaths):
         leoY = np.array(dataset['y_LEO'][:]) * 1000     # store the entire TEC data in variable TEC
         leoZ = np.array(dataset['z_LEO'][:]) * 1000     # store the entire TEC data in variable TEC
 
+        # get and store LEO - GPS link elevation angle
+        elevation = np.array(dataset['elevation'][:])
+
         # convert to LLA
         lat, lon, alt = pm.ecef2geodetic(leoX, leoY, leoZ, ell=None, deg=True)
 
@@ -83,7 +87,7 @@ def importDataToClassList(directoryPath, numPaths):
             tecDiff.append(tecDifferenceSecond)                 # append to empty container
         tecDiff = np.append(tecDiff, [0])                       # to ensure remains same length as time arrays for plots add 0 to end of array
 
-        tecDataList.append(tecData(leo=leoId, prn=prnId, antId=antennaId, utcTime=utcTime, tec=tec, tecDiff=tecDiff, lat=lat, lon=lon)) # Add data extracted to class in data list
+        tecDataList.append(tecData(leo=leoId, prn=prnId, antId=antennaId, utcTime=utcTime, tec=tec, tecDiff=tecDiff, lat=lat, lon=lon, elev=elevation)) # Add data extracted to class in data list
 
     print("Data Import Complete - Now Sorting Data")
 
