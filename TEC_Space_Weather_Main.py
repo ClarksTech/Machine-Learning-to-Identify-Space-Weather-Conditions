@@ -2,7 +2,6 @@
 import Import_Cosmic_Data as Data
 import Display_Cosmic_Data as Display
 
-
 #####################################################################
 ####################### Main Program Script #########################
 #####################################################################
@@ -35,6 +34,9 @@ tecDataList = Data.importDataToClassList(directoryPath, numberOfFiles)
 
 # Display TEC Diff vs UTC time
 Display.displayTecDiffVsUtc(tecDataList)
+
+# Display TEC Diff vs UTC time specific
+Display.displayTecDiffVsUtcSpecific(tecDataList)
 
 # Display TEC Diff measurements on world map
 Display.displayTecDiffWorldMap(tecDataList)
