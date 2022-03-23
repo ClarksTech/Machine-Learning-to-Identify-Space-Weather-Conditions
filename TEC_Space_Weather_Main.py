@@ -32,9 +32,12 @@ tecDataList = Data.importDataToClassList(directoryPath, numberOfFiles)
 #            count += 1
 #print("Data Points in a 30 by 30 degree square = ", count)
 
-# Display the TEC vs elevation
+# Display the TEC Diff vs elevation
 while(1):
-    Display.displayTecVsElevation(tecDataList)
+    Display.displayTecDiffVsElevation(tecDataList)
+
+# Display the TEC vs elevation
+Display.displayTecVsElevation(tecDataList)
 
 # Display TEC Diff vs UTC time
 Display.displayTecDiffVsUtc(tecDataList)
