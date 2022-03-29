@@ -9,7 +9,7 @@ import pymap3d as pm
 ################## Class to Hold TEC for each LEO ###################
 #####################################################################
 class tecData(object):
-    def __init__(self,leo=None, prn=None, antId=None, utcTime=None, tec=None, tecDiff=None, lat=None, lon=None, elev=None):  # define class and parameters
+    def __init__(self,leo=None, prn=None, antId=None, utcTime=None, tec=None, tecDiff=None, lat=None, lon=None, elev=None, movingAv=None, tdMaDiff=None):  # define class and parameters
         self.leo = leo              # refrenced to self. for access to LEO
         self.prn = prn              # refrenced to self. for access to PRN  
         self.antId = antId          # refrenced to self. for access to antenna ID                              
@@ -19,6 +19,8 @@ class tecData(object):
         self.lat = lat              # refrenced to self. for access to latitude
         self.lon = lon              # refrenced to self. for access to longitude
         self.elev = elev            # refrenced to self. for access to elevation angle
+        self.movingAv = movingAv    # refrenced to self. for access to moving average
+        self.tdMaDiff = tdMaDiff    # refrenced to self. for access to difference between TEC Diff and Moving average
 
 #####################################################################
 ####### Count Number of Files to be loaded for progress bar #########
