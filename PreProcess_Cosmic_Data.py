@@ -49,7 +49,7 @@ def displayDeltaVsUtc(tecDataList):
     print("Plotting diff between Tec Diff and Moving Average vs Time...")
     for data in tecDataList:
         plt.plot(data.utcTime, data.tdMaDiff)                                                   # plot time vs TEC
-        plt.ylabel("Diff between TEC Diff and Moving Average (TECU per Second")                 # label y axis
+        plt.ylabel("Diff between TEC Diff and Moving Average (TECU per Second)")                # label y axis
         plt.xlabel("UTC Time of Measurement")                                                   # label x axis
         plt.title(f"Tec Diff and Moving Average vs Time for LEO 1-6 PRN 1-32 on {data.utcTime[0].year}/{data.utcTime[0].month}/{data.utcTime[0].day}")  # title 
     plt.show()
