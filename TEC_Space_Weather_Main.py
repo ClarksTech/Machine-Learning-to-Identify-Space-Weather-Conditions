@@ -1,6 +1,7 @@
 # include required files
 import Import_Cosmic_Data as Data
 import Display_Cosmic_Data as Display
+import PreProcess_Cosmic_Data as PrePro
 
 #####################################################################
 ####################### Main Program Script #########################
@@ -31,6 +32,15 @@ tecDataList = Data.importDataToClassList(directoryPath, numberOfFiles)
 #        if 0 <= data.lat[i] <= 15 and 0 <= data.lon[i] <= 15 :
 #            count += 1
 #print("Data Points in a 30 by 30 degree square = ", count)
+
+# Generate moving averages test
+PrePro.calculateMovingAverages(tecDataList)
+
+# Generate difference between moving average and Tec Diff
+PrePro.calculateMaTecDiffDiff(tecDataList)
+
+# Display the Delta vs time
+PrePro.displayDeltaVsUtc(tecDataList)
 
 # Display the TEC Diff vs elevation
 Display.displayTecDiffVsElevation(tecDataList)
