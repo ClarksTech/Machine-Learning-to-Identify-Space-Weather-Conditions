@@ -52,13 +52,8 @@ def importDataToClassList(directoryPath, numPaths):
 
         # Access the data and obtain TEC and measurement time
         dataset = nc.Dataset(path)                      # Access the dataset using netCDF4 library tools
-        tec = np.array(dataset['TEC'][:])               # store the entire TEC data in variable TEC
-        measurementTime = np.array(dataset['time'][:])  # store entire time data in variable
-
-        # convert GPS time to UTC time
-        utcTime = []                    # initialise array to hold utcTime
-        for time in measurementTime:    # convert every measurement
-            utcTime.append(datetime(1980, 1, 6) + timedelta(seconds=time - (37 - 19)))  # GPS and UTS initialised 1980,1,6. Add time delta acounting for leapseconds
+        tecTemp = np.array(dataset['TEC'][:])               # store the entire TEC data in variable TEC
+        measurementTimeTemp = np.array(dataset['time'][:])  # store entire time data in variable
 
         # Identify the LEO and PRN satellites used for measurements
         leoId = dataset.__dict__['leo_id']          # Store LEO ID
@@ -70,31 +65,51 @@ def importDataToClassList(directoryPath, numPaths):
         leoY = np.array(dataset['y_LEO'][:]) * 1000     # store the entire TEC data in variable TEC
         leoZ = np.array(dataset['z_LEO'][:]) * 1000     # store the entire TEC data in variable TEC
 
-        # get and store LEO - GPS link elevation angle
-        elevation = np.array(dataset['elevation'][:])
-
         # convert to LLA
-        lat, lon, alt = pm.ecef2geodetic(leoX, leoY, leoZ, ell=None, deg=True)
+        latTemp, lonTemp, alt = pm.ecef2geodetic(leoX, leoY, leoZ, ell=None, deg=True)
 
-        # Calculate the TEC difference between measurements
-        tempTecArr = np.array(tec)  # create temp array to avoid altering TEC array
-        tecDiff = []                # create empty array to hold the tec differences
-        # repeat for all tec values excluding last as is no next value to difference off
-        for i in range(len(tempTecArr)-1):
-            timeDif = measurementTime[i+1]-measurementTime[i]   # calculated time difference between TEC measurements
-            tecDif = tempTecArr[i+1]-tempTecArr[i]              # calculate TEC difference between measuremnts
-            tecDifferenceSecond = tecDif/timeDif                # calculate diff as change in TEC over change in time so is TECu per Second
-            tecDiff.append(tecDifferenceSecond)                 # append to empty container
-        tecDiff = np.append(tecDiff, [0])                       # to ensure remains same length as time arrays for plots add 0 to end of array
+        # get and store LEO - GPS link elevation angle
+        elevationTemp = np.array(dataset['elevation'][:])
 
-        tecDataList.append(tecData(leo=leoId, prn=prnId, antId=antennaId, utcTime=utcTime, tec=tec, tecDiff=tecDiff, lat=lat, lon=lon, elev=elevation)) # Add data extracted to class in data list
+        # Only keep values for elevations at or below 0 degrees
+        tec = []                # empty array to hold values of correct elevation
+        measurementTime = []    # empty array to hold values of correct elevation  
+        lat = []                # empty array to hold values of correct elevation
+        lon = []                # empty array to hold values of correct elevation
+        elevation = []          # empty array to hold values of correct elevation
+        negativeFlag = 0        # flag to determine if negative exists in measurement set
 
-    print("Data Import Complete - Now Sorting Data")
+        # Loop over all datapoints and add to final arrya if is of negative elevation
+        for i in range(len(elevationTemp)):
+            if elevationTemp[i] <= 0:
+                elevation.append(elevationTemp[i])
+                tec.append(tecTemp[i])
+                measurementTime.append(measurementTimeTemp[i])
+                lat.append(latTemp[i])
+                lon.append(lonTemp[i])
+                negativeFlag = 1        # set negative flag to 1 to acknowledge are negatives
 
-    # sort list by LEO ID, and then by PRN ID
-    tecDataList.sort(key=lambda l: (l.leo, l.prn, l.utcTime[0]))
-    
-    print("Data Sort Complete")
+        # only perform further conversions and add to array of objects if negatives exist
+        if negativeFlag == 1:
+            # convert GPS time to UTC time
+            utcTime = []                    # initialise array to hold utcTime
+            for time in measurementTime:    # convert every measurement
+                utcTime.append(datetime(1980, 1, 6) + timedelta(seconds=time - (37 - 19)))  # GPS and UTS initialised 1980,1,6. Add time delta acounting for leapseconds
+
+            # Calculate the TEC difference between measurements
+            tempTecArr = np.array(tec)      # create temp array to avoid altering TEC array
+            tecDiff = []                    # create empty array to hold the tec differences
+            # repeat for all tec values excluding last as is no next value to difference off
+            for i in range(len(tempTecArr)-1):
+                timeDif = measurementTime[i+1]-measurementTime[i]   # calculated time difference between TEC measurements
+                tecDif = tempTecArr[i+1]-tempTecArr[i]              # calculate TEC difference between measuremnts
+                tecDifferenceSecond = tecDif/timeDif                # calculate diff as change in TEC over change in time so is TECu per Second
+                tecDiff.append(tecDifferenceSecond)                 # append to empty container
+            tecDiff.append(0)                                       # assign 0 to last value as no next value to difference off
+
+            tecDataList.append(tecData(leo=leoId, prn=prnId, antId=antennaId, utcTime=utcTime, tec=tec, tecDiff=tecDiff, lat=lat, lon=lon, elev=elevation)) # Add data extracted to class in data list
+
+    print("Progress of Data import: 100 % - Import Complete")
 
     return(tecDataList)             # return the list of class objects
 
