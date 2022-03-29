@@ -36,11 +36,11 @@ def displayTecDiffWorldMap(tecDataList):
 
     # repeat for every TEC measurement for entire day
     for data in tecDataList:
-        map.scatter(data.lon, data.lat, latlon=True, c=data.tecDiff, s=10, cmap='RdBu_r', alpha=0.2)  # Plot as a scatter where shade of red depends on TEC Diff value
-    plt.colorbar(label='TECU per Second')                                                                 # Add coloutbar key for TECu Shades of red
-    plt.clim(-10,10)                                                                                # Key from 0 to 1000 (max TEC Diff measurement ~+-50)
-    plt.xlabel('Longitude', labelpad=40, fontsize=8)                                                # Add x axis label
-    plt.ylabel('Latitude', labelpad=40, fontsize=8)                                                 # Add y axis label
+        map.scatter(data.lon, data.lat, latlon=True, c=data.tecDiff, s=10, cmap='RdBu_r', alpha=0.2)    # Plot as a scatter where shade of red depends on TEC Diff value
+    plt.colorbar(label='TECU per Second')                                                               # Add coloutbar key for TECu Shades of red
+    plt.clim(-10,10)                                                                                    # Key from 0 to 1000 (max TEC Diff measurement ~+-50)
+    plt.xlabel('Longitude', labelpad=40, fontsize=8)                                                    # Add x axis label
+    plt.ylabel('Latitude', labelpad=40, fontsize=8)                                                     # Add y axis label
     plt.title(f'COSMIC 2 TEC Diff plot on global map on {data.utcTime[0].year}/{data.utcTime[0].month}/{data.utcTime[0].day}', fontsize=8)  # Add title
     plt.show()
     return()
@@ -68,7 +68,7 @@ def displayTecDiffVsUtc(tecDataList):
     for data in tecDataList:
         plt.plot(data.utcTime, data.tecDiff)                            # plot time vs TEC
         plt.ylabel("TEC Diff along LEO-GPS link (TECU per Second)")     # label y axis
-        plt.xlabel("UTC Time of Measurement")                          # label x axis
+        plt.xlabel("UTC Time of Measurement")                           # label x axis
         plt.title(f"TEC Diff plot for LEO 1-6 PRN 1-32 on {data.utcTime[0].year}/{data.utcTime[0].month}/{data.utcTime[0].day}") # title 
     plt.show()
     return()
@@ -89,7 +89,7 @@ def displayTecVsUtcSpecific(tecDataList):
             plt.plot(data.utcTime, data.tec)                    # plot time vs TEC
 
     plt.ylabel("TEC along LEO-GPS link (TECU)")                 # label y axis
-    plt.xlabel("UTC Time of Measurement")                      # label x axis
+    plt.xlabel("UTC Time of Measurement")                       # label x axis
     plt.title(f"TEC plot for LEO {displayLeo} PRN {displayPrn} on {data.utcTime[0].year}/{data.utcTime[0].month}/{data.utcTime[0].day}")    # title 
     plt.show()
     return()
@@ -110,7 +110,7 @@ def displayTecDiffVsUtcSpecific(tecDataList):
             plt.plot(data.utcTime, data.tecDiff)                # plot time vs TEC Diff
 
     plt.ylabel("TEC Diff along LEO-GPS link (TECU/S)")          # label y axis
-    plt.xlabel("UTC Time of Measurement")                      # label x axis
+    plt.xlabel("UTC Time of Measurement")                       # label x axis
     plt.title(f"TEC Diff plot for LEO {displayLeo} PRN {displayPrn} on {data.utcTime[0].year}/{data.utcTime[0].month}/{data.utcTime[0].day}")   # title 
     plt.show()
     return()
