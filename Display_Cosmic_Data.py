@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt             # for graphing data to validate its 
 ############### Function to display TEC on World Map ################
 #####################################################################
 def displayTecWorldMap(tecDataList):
-    print("Drawing World Map of TEC")
+    print("Drawing World Map of TEC...")
     map = Basemap()                                                                             # Using basemap as basis for world map
     map.drawcoastlines()                                                                        # Only add the costal lines to the map for visual refrence
     map.drawparallels(np.arange(-90,90,30),labels=[1,1,0,1], fontsize=8)                        # Add Longitude lines and degree labels
@@ -28,7 +28,7 @@ def displayTecWorldMap(tecDataList):
 ############ Function to display TEC Diff on World Map ##############
 #####################################################################
 def displayTecDiffWorldMap(tecDataList):
-    print("Drawing World Map of TEC Diff")
+    print("Drawing World Map of TEC Diff...")
     map = Basemap()                                                                             # Using basemap as basis for world map
     map.drawcoastlines()                                                                        # Only add the costal lines to the map for visual refrence
     map.drawparallels(np.arange(-90,90,30),labels=[1,1,0,1], fontsize=8)                        # Add Longitude lines and degree labels
@@ -50,7 +50,7 @@ def displayTecDiffWorldMap(tecDataList):
 #####################################################################
 def displayTecVsUtc(tecDataList):
     # plot time vs TEC
-    print("Plotting TEC vs Time")
+    print("Plotting TEC vs Time...")
     for data in tecDataList:
         plt.plot(data.utcTime, data.tec)                            # plot time vs TEC
         plt.ylabel("TEC along LEO-GPS link (TECU)")                 # label y axis
@@ -64,7 +64,7 @@ def displayTecVsUtc(tecDataList):
 #####################################################################
 def displayTecDiffVsUtc(tecDataList):
     # plot time vs TEC
-    print("Plotting TEC Diff vs Time")
+    print("Plotting TEC Diff vs Time...")
     for data in tecDataList:
         plt.plot(data.utcTime, data.tecDiff)                            # plot time vs TEC
         plt.ylabel("TEC Diff along LEO-GPS link (TECU per Second)")     # label y axis
@@ -77,6 +77,7 @@ def displayTecDiffVsUtc(tecDataList):
 ######### Function to display TEC vs UTC time (specific) ############
 #####################################################################
 def displayTecVsUtcSpecific(tecDataList):
+    print("Plotting specific TEC vs Time...")
     # plot time vs TEC for specific LEO and PRN ID
     print("Enter LEO ID to display: ")      # prompt user to enter LEO ID
     displayLeo = int(input())               # capture LEO ID
@@ -98,6 +99,7 @@ def displayTecVsUtcSpecific(tecDataList):
 ####### Function to display TEC Diff vs UTC time (specific) #########
 #####################################################################
 def displayTecDiffVsUtcSpecific(tecDataList):
+    print("Plotting specific TEC Diff vs Time...")
     # plot time vs TEC Diff for specific LEO and PRN ID
     print("Enter LEO ID to display: ")      # prompt user to enter LEO ID
     displayLeo = int(input())               # capture LEO ID
@@ -119,6 +121,7 @@ def displayTecDiffVsUtcSpecific(tecDataList):
 ############ Function to display TEC vs elevation angle #############
 #####################################################################
 def displayTecVsElevation(tecDataList):
+    print("Plotting specific TEC vs Elevation...")
     # plot time vs TEC Diff for specific LEO and PRN ID
     print("Enter LEO ID to display: ")      # prompt user to enter LEO ID
     displayLeo = int(input())               # capture LEO ID
@@ -140,6 +143,7 @@ def displayTecVsElevation(tecDataList):
 ######### Function to display TEC Diff vs elevation angle ###########
 #####################################################################
 def displayTecDiffVsElevation(tecDataList):
+    print("Plotting specific TEC Diff vs Elevation...")
     # plot time vs TEC Diff for specific LEO and PRN ID
     print("Enter LEO ID to display: ")      # prompt user to enter LEO ID
     displayLeo = int(input())               # capture LEO ID
