@@ -9,7 +9,9 @@ import pymap3d as pm
 ################## Class to Hold TEC for each LEO ###################
 #####################################################################
 class tecData(object):
-    def __init__(self,leo=None, prn=None, antId=None, utcTime=None, tec=None, tecDiff=None, lat=None, lon=None, elev=None, movingAv=None, tdMaDiff=None):  # define class and parameters
+    def __init__(self,leo=None, prn=None, antId=None, utcTime=None, tec=None, tecDiff=None, 
+    lat=None, lon=None, elev=None, movingAv=None, delta=None):                               # define class and parameters
+
         self.leo = leo              # refrenced to self. for access to LEO
         self.prn = prn              # refrenced to self. for access to PRN  
         self.antId = antId          # refrenced to self. for access to antenna ID                              
@@ -20,19 +22,19 @@ class tecData(object):
         self.lon = lon              # refrenced to self. for access to longitude
         self.elev = elev            # refrenced to self. for access to elevation angle
         self.movingAv = movingAv    # refrenced to self. for access to moving average
-        self.tdMaDiff = tdMaDiff    # refrenced to self. for access to difference between TEC Diff and Moving average
+        self.delta = delta          # refrenced to self. for access to difference between TEC Diff and Moving average
 
 #####################################################################
 ####### Count Number of Files to be loaded for progress bar #########
 #####################################################################
 def getNumFiles(directoryPath):
-    paths = Path(directoryPath).glob('**/*.3430_nc')                                                                    # Path for all .3430_nc podTEC files
+    paths = Path(directoryPath).glob('**/*.3430_nc')        # Path for all .3430_nc podTEC files
     # Progres bar setup
     numPaths = 0
     # increment counter for every path
     for path in paths:
         numPaths += 1
-    print("Number of Data Files to Import: ", numPaths)    # print total number of files to be loaded
+    print("Number of Data Files to Import: ", numPaths)     # print total number of files to be loaded
     return (numPaths)
 
 #####################################################################
@@ -66,6 +68,11 @@ def importDataToClassList(directoryPath, numPaths):
         leoX = np.array(dataset['x_LEO'][:]) * 1000     # store the entire TEC data in variable TEC
         leoY = np.array(dataset['y_LEO'][:]) * 1000     # store the entire TEC data in variable TEC
         leoZ = np.array(dataset['z_LEO'][:]) * 1000     # store the entire TEC data in variable TEC
+
+        # get LEO satellite ECEF coordinate converting to metres
+        gpsX = np.array(dataset['x_LEO'][:]) * 1000     # store the entire TEC data in variable TEC
+        gpsY = np.array(dataset['y_LEO'][:]) * 1000     # store the entire TEC data in variable TEC
+        gpsZ = np.array(dataset['z_LEO'][:]) * 1000     # store the entire TEC data in variable TEC
 
         # convert to LLA
         latTemp, lonTemp, alt = pm.ecef2geodetic(leoX, leoY, leoZ, ell=None, deg=True)

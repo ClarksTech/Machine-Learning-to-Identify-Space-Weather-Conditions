@@ -28,13 +28,14 @@ tecDataList = Data.importDataToClassList(directoryPath, numberOfFiles)
 PrePro.calculateMovingAverages(tecDataList)
 
 # Generate difference between moving average and Tec Diff
-PrePro.calculateMaTecDiffDiff(tecDataList)
+PrePro.calculateDelta(tecDataList)
 
 # Display the Delta vs time
 PrePro.displayDeltaVsUtc(tecDataList)
 
-# Display the Delta vs time specific
-PrePro.displayDeltaVsUtcSpecific(tecDataList)
+while(1):
+    # Display the Delta vs time specific
+    PrePro.displayDeltaVsUtcSpecific(tecDataList)
 
 # Display the Delta on world map
 PrePro.displayTecDeltaWorldMap(tecDataList)

@@ -27,9 +27,9 @@ def calculateMovingAverages(tecDataList):
     return()
 
 #####################################################################
-########## Function to obtain diff between MA and tec Diff ##########
+########## Function to obtain delta between MA and tec Diff ##########
 #####################################################################
-def calculateMaTecDiffDiff(tecDataList):
+def calculateDelta(tecDataList):
     print("Calculating Delta between Moving Averages and TEC Diff...")
     # repeat for every TEC Diff measurement for entire day
     for data in tecDataList:
@@ -37,29 +37,29 @@ def calculateMaTecDiffDiff(tecDataList):
         arrayTwo = np.array(data.movingAv)              # array being subtracted is the moving average
         deltaArray = np.subtract(arrayOne, arrayTwo)    # subtract arrays to find the difference
         delta = list(deltaArray)                        # convert back to list
-        data.tdMaDiff = delta                           # assign to object
+        data.delta = delta                           # assign to object
     print("Delta's Calculated Successfully")
     return()
 
 #####################################################################
-######### Function to display TEC diff to MA vs UTC time ############
+############## Function to display Delta vs UTC time ################
 #####################################################################
 def displayDeltaVsUtc(tecDataList):
     # plot time vs TEC
-    print("Plotting diff between Tec Diff and Moving Average vs Time...")
+    print("Plotting Delta vs Time...")
     for data in tecDataList:
-        plt.plot(data.utcTime, data.tdMaDiff)                                                   # plot time vs TEC
-        plt.ylabel("Diff between TEC Diff and Moving Average (TECU per Second)")                # label y axis
+        plt.plot(data.utcTime, data.delta)                                                      # plot time vs TEC
+        plt.ylabel("Delta between TEC Diff and Moving Average (TECU per Second)")               # label y axis
         plt.xlabel("UTC Time of Measurement")                                                   # label x axis
-        plt.title(f"Tec Diff and Moving Average vs Time for LEO 1-6 PRN 1-32 on {data.utcTime[0].year}/{data.utcTime[0].month}/{data.utcTime[0].day}")  # title 
+        plt.title(f"Delta vs Time for LEO 1-6 PRN 1-32 on {data.utcTime[0].year}/{data.utcTime[0].month}/{data.utcTime[0].day}")  # title 
     plt.show()
     return()
 
 #####################################################################
-##### Function to display specific TEC diff to MA vs UTC time #######
+########## Function to display specific Delta vs UTC time ###########
 #####################################################################
 def displayDeltaVsUtcSpecific(tecDataList):
-    print("Plotting specific diff between Tec Diff and Moving Average vs Time...")
+    print("Plotting specific Delta vs Time...")
     # plot time vs TEC for specific LEO and PRN ID
     print("Enter LEO ID to display: ")      # prompt user to enter LEO ID
     displayLeo = int(input())               # capture LEO ID
@@ -69,11 +69,11 @@ def displayDeltaVsUtcSpecific(tecDataList):
     # search list and only plot if is specified LEO and PRN ID
     for data in tecDataList:
         if data.leo == displayLeo and data.prn == displayPrn:   # only LEO and PRN ID for given antenna to avoid double readings
-            plt.plot(data.utcTime, data.tdMaDiff)               # plot time vs TEC
+            plt.plot(data.utcTime, data.delta)                  # plot time vs TEC
 
-    plt.ylabel("Diff between TEC Diff and Moving Average (TECU per Second")                 # label y axis
-    plt.xlabel("UTC Time of Measurement")                                                   # label x axis
-    plt.title(f"Tec Diff and Moving Average vs Time for LEO {displayLeo} PRN {displayPrn} on {data.utcTime[0].year}/{data.utcTime[0].month}/{data.utcTime[0].day}")    # title 
+    plt.ylabel("Delta between TEC Diff and Moving Average (TECU per Second")    # label y axis
+    plt.xlabel("UTC Time of Measurement")                                       # label x axis
+    plt.title(f"Delta vs Time for LEO {displayLeo} PRN {displayPrn} on {data.utcTime[0].year}/{data.utcTime[0].month}/{data.utcTime[0].day}")    # title 
     plt.show()
     return()
 
@@ -81,7 +81,7 @@ def displayDeltaVsUtcSpecific(tecDataList):
 ########### Function to display TEC Delta on World Map ##############
 #####################################################################
 def displayTecDeltaWorldMap(tecDataList):
-    print("Drawing World Map of TEC Delta...")
+    print("Drawing World Map of Delta...")
     map = Basemap()                                                                             # Using basemap as basis for world map
     map.drawcoastlines()                                                                        # Only add the costal lines to the map for visual refrence
     map.drawparallels(np.arange(-90,90,30),labels=[1,1,0,1], fontsize=8)                        # Add Longitude lines and degree labels
@@ -89,7 +89,7 @@ def displayTecDeltaWorldMap(tecDataList):
 
     # repeat for every TEC measurement for entire day
     for data in tecDataList:
-        map.scatter(data.lon, data.lat, latlon=True, c=data.tdMaDiff, s=10, cmap='RdBu_r', alpha=0.2)       # Plot as a scatter where shade of red depends on TEC Diff value
+        map.scatter(data.lon, data.lat, latlon=True, c=data.delta, s=10, cmap='RdBu_r', alpha=0.2)          # Plot as a scatter where shade of red depends on TEC Diff value
     plt.colorbar(label='TECU per Second')                                                                   # Add coloutbar key for TECu Shades of red
     plt.clim(-5,5)                                                                                          # Key from 0 to 1000 (max TEC Diff measurement ~+-50)
     plt.xlabel('Longitude', labelpad=40, fontsize=8)                                                        # Add x axis label
