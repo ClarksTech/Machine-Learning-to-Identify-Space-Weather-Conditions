@@ -27,7 +27,7 @@ def calculateMovingAverages(tecDataList):
     return()
 
 #####################################################################
-########## Function to obtain delta between MA and tec Diff ##########
+########## Function to obtain delta between MA and tec Diff #########
 #####################################################################
 def calculateDelta(tecDataList):
     print("Calculating Delta between Moving Averages and TEC Diff...")
@@ -37,8 +37,39 @@ def calculateDelta(tecDataList):
         arrayTwo = np.array(data.movingAv)              # array being subtracted is the moving average
         deltaArray = np.subtract(arrayOne, arrayTwo)    # subtract arrays to find the difference
         delta = list(deltaArray)                        # convert back to list
-        data.delta = delta                           # assign to object
+        data.delta = delta                              # assign to object
     print("Delta's Calculated Successfully")
+    return()
+
+#####################################################################
+########### Function to obtain P1, P2, and TP coordinates ###########
+#####################################################################
+def calculateIntersects(tecDataList):
+    print("Calculating P1, P2, and TP coordinates...")
+    # repeat for every TEC Diff measurement for entire day
+    for data in tecDataList:
+        for i in range(len(data.xLeo)):
+            # initialise the coordinates as single arrays for easy manipulation
+            leoCoordinate = [data.xLeo[i], data.yLeo[i], data.zLeo[i]]
+            gpsCoordinate = [data.xGps[i], data.yGps[i], data.zGps[i]]
+            earthCoordinate = [0, 0, 0]
+
+            # Generate required intermediate vectors and scalars
+            leoGpsVector = [leoCoordinate[0]-gpsCoordinate[0], leoCoordinate[1]-gpsCoordinate[1], leoCoordinate[2]-gpsCoordinate[2]]            # ray direction vector
+            leoGpsVectorNormalised = leoGpsVector/ np.sqrt(leoGpsVector[0]**2 + leoGpsVector[1]**2 + leoGpsVector[2]**2)                        # normalised ray vector                                                          # ray direction vector normalised
+            gpsEarthVector = [earthCoordinate[0]-gpsCoordinate[0], earthCoordinate[1]-gpsCoordinate[1], earthCoordinate[2]-gpsCoordinate[2]]    # vector from GPS satellite to earth centre
+            tca = np.dot(gpsEarthVector, leoGpsVectorNormalised)                        # tca is distance to TP point along ray path
+            d = np.sqrt((np.dot(gpsEarthVector, gpsEarthVector) - np.dot(tca, tca)))    # d is distance from centre of earth to ray path (orthodonal)
+            thc = np.sqrt(((6371000+350000)**2)-d**2)                                   # thc is distance between TP point and P1 along ray path
+            t0 = tca - thc                                      # scalar on ray path for P1
+            t1 = tca + thc                                      # scalar on ray path for P2
+
+            # Generate final P1, P2, and Tp coordinated
+            p1 = gpsCoordinate + t0*leoGpsVectorNormalised      # first intersect coordinates
+            p2 = gpsCoordinate + t1*leoGpsVectorNormalised      # second intersect coordinates
+            tp = gpsCoordinate + tca*leoGpsVectorNormalised     # TP point coordinates
+
+    print("Coordinates's Calculated Successfully")
     return()
 
 #####################################################################

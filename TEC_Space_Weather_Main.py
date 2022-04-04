@@ -30,6 +30,9 @@ PrePro.calculateMovingAverages(tecDataList)
 # Generate difference between moving average and Tec Diff
 PrePro.calculateDelta(tecDataList)
 
+# Generate Intersection coordinates
+PrePro.calculateIntersects(tecDataList)
+
 # Display the Delta vs time
 PrePro.displayDeltaVsUtc(tecDataList)
 
