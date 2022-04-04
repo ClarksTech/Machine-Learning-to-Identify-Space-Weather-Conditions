@@ -28,9 +28,9 @@ class tecData(object):
         self.xLeo = xLeo            # refrenced to self. for access to coordinates in metres
         self.yLeo = yLeo            # refrenced to self. for access to coordinates in metres
         self.zLeo = zLeo            # refrenced to self. for access to coordinates in metres
-        self.xLeo = xGps            # refrenced to self. for access to coordinates in metres
-        self.yLeo = yGps            # refrenced to self. for access to coordinates in metres
-        self.zLeo = zGps            # refrenced to self. for access to coordinates in metres
+        self.xGps = xGps            # refrenced to self. for access to coordinates in metres
+        self.yGps = yGps            # refrenced to self. for access to coordinates in metres
+        self.zGps = zGps            # refrenced to self. for access to coordinates in metres
         self.xP1 = xP1              # refrenced to self. for access to coordinates in metres
         self.yP1 = yP1              # refrenced to self. for access to coordinates in metres
         self.zP1 = zP1              # refrenced to self. for access to coordinates in metres
@@ -87,9 +87,9 @@ def importDataToClassList(directoryPath, numPaths):
         leoZ = np.array(dataset['z_LEO'][:]) * 1000     # store the entire TEC data in variable TEC
 
         # get LEO satellite ECEF coordinate converting to metres
-        gpsX = np.array(dataset['x_LEO'][:]) * 1000     # store the entire TEC data in variable TEC
-        gpsY = np.array(dataset['y_LEO'][:]) * 1000     # store the entire TEC data in variable TEC
-        gpsZ = np.array(dataset['z_LEO'][:]) * 1000     # store the entire TEC data in variable TEC
+        gpsX = np.array(dataset['x_GPS'][:]) * 1000     # store the entire TEC data in variable TEC
+        gpsY = np.array(dataset['y_GPS'][:]) * 1000     # store the entire TEC data in variable TEC
+        gpsZ = np.array(dataset['z_GPS'][:]) * 1000     # store the entire TEC data in variable TEC
 
         # convert to LLA
         latTemp, lonTemp, alt = pm.ecef2geodetic(leoX, leoY, leoZ, ell=None, deg=True)
@@ -145,7 +145,8 @@ def importDataToClassList(directoryPath, numPaths):
                 tecDiff.append(tecDifferenceSecond)                 # append to empty container
             tecDiff.append(0)                                       # assign 0 to last value as no next value to difference off
 
-            tecDataList.append(tecData(leo=leoId, prn=prnId, antId=antennaId, utcTime=utcTime, tec=tec, tecDiff=tecDiff, lat=lat, lon=lon, elev=elevation)) # Add data extracted to class in data list
+            tecDataList.append(tecData(leo=leoId, prn=prnId, antId=antennaId, utcTime=utcTime, tec=tec, tecDiff=tecDiff, lat=lat, lon=lon, elev=elevation,
+            xLeo=xLeo, yLeo=yLeo, zLeo=zLeo, xGps=xGps, yGps=yGps, zGps=zGps)) # Add data extracted to class in data list
 
     print("Progress of Data import: 100 % - Import Complete")
 
