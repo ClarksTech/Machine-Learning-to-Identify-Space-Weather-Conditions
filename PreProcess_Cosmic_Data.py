@@ -48,6 +48,16 @@ def calculateIntersects(tecDataList):
     print("Calculating P1, P2, and TP coordinates...")
     # repeat for every TEC Diff measurement for entire day
     for data in tecDataList:
+        # Arrays to be returned to object
+        xP1 = []
+        yP1 = []
+        zP1 = []
+        xP2 = []
+        yP2 = []
+        zP2 = []
+        xTp = []
+        yTp = []
+        zTp = []
         for i in range(len(data.xLeo)):
             # initialise the coordinates as single arrays for easy manipulation
             leoCoordinate = [data.xLeo[i], data.yLeo[i], data.zLeo[i]]
@@ -68,6 +78,28 @@ def calculateIntersects(tecDataList):
             p1 = gpsCoordinate + t0*leoGpsVectorNormalised      # first intersect coordinates
             p2 = gpsCoordinate + t1*leoGpsVectorNormalised      # second intersect coordinates
             tp = gpsCoordinate + tca*leoGpsVectorNormalised     # TP point coordinates
+
+            # append to arrays
+            xP1.append(p1[0])
+            yP1.append(p1[1])
+            zP1.append(p1[2])
+            xP2.append(p2[0])
+            yP2.append(p2[1])
+            zP2.append(p2[2])
+            xTp.append(tp[0])
+            yTp.append(tp[1])
+            zTp.append(tp[2])
+        
+        # Store back in object
+        data.xP1 = xP1
+        data.yP1 = yP1
+        data.zP1 = zP1
+        data.xP2 = xP2
+        data.yP2 = yP2
+        data.zP2 = zP2
+        data.xTp = xTp
+        data.yTp = yTp
+        data.zTp = zTp
 
     print("Coordinates's Calculated Successfully")
     return()
