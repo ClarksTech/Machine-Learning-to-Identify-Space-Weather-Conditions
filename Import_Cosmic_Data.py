@@ -10,7 +10,9 @@ import pymap3d as pm
 #####################################################################
 class tecData(object):
     def __init__(self,leo=None, prn=None, antId=None, utcTime=None, tec=None, tecDiff=None, 
-    lat=None, lon=None, elev=None, movingAv=None, delta=None):                               # define class and parameters
+    lat=None, lon=None, elev=None, movingAv=None, delta=None, xLeo=None, yLeo=None, zLeo=None,
+    xGps=None, yGps=None, zGps=None, xP1=None, yP1=None, zP1=None, xP2=None, yP2=None, zP2=None,
+    xTp=None, yTp=None, zTp=None):                               # define class and parameters
 
         self.leo = leo              # refrenced to self. for access to LEO
         self.prn = prn              # refrenced to self. for access to PRN  
@@ -23,6 +25,21 @@ class tecData(object):
         self.elev = elev            # refrenced to self. for access to elevation angle
         self.movingAv = movingAv    # refrenced to self. for access to moving average
         self.delta = delta          # refrenced to self. for access to difference between TEC Diff and Moving average
+        self.xLeo = xLeo            # refrenced to self. for access to coordinates in metres
+        self.yLeo = yLeo            # refrenced to self. for access to coordinates in metres
+        self.zLeo = zLeo            # refrenced to self. for access to coordinates in metres
+        self.xLeo = xGps            # refrenced to self. for access to coordinates in metres
+        self.yLeo = yGps            # refrenced to self. for access to coordinates in metres
+        self.zLeo = zGps            # refrenced to self. for access to coordinates in metres
+        self.xP1 = xP1              # refrenced to self. for access to coordinates in metres
+        self.yP1 = yP1              # refrenced to self. for access to coordinates in metres
+        self.zP1 = zP1              # refrenced to self. for access to coordinates in metres
+        self.xP2 = xP2              # refrenced to self. for access to coordinates in metres
+        self.yP2 = yP2              # refrenced to self. for access to coordinates in metres
+        self.zP2 = zP2              # refrenced to self. for access to coordinates in metres
+        self.xTp = xTp              # refrenced to self. for access to coordinates in metres
+        self.yTp = yTp              # refrenced to self. for access to coordinates in metres
+        self.zTp = zTp              # refrenced to self. for access to coordinates in metres
 
 #####################################################################
 ####### Count Number of Files to be loaded for progress bar #########
@@ -87,6 +104,12 @@ def importDataToClassList(directoryPath, numPaths):
         lon = []                # empty array to hold values of correct elevation
         elevation = []          # empty array to hold values of correct elevation
         negativeFlag = 0        # flag to determine if negative exists in measurement set
+        xLeo = []               # empty array to hold coordinates
+        yLeo = []               # empty array to hold coordinates
+        zLeo = []               # empty array to hold coordinates
+        xGps = []               # empty array to hold coordinates
+        yGps = []               # empty array to hold coordinates
+        zGps = []               # empty array to hold coordinates
 
         # Loop over all datapoints and add to final arrya if is of negative elevation
         for i in range(len(elevationTemp)):
@@ -96,6 +119,12 @@ def importDataToClassList(directoryPath, numPaths):
                 measurementTime.append(measurementTimeTemp[i])
                 lat.append(latTemp[i])
                 lon.append(lonTemp[i])
+                xLeo.append(leoX[i])
+                yLeo.append(leoY[i])
+                zLeo.append(leoZ[i])
+                xGps.append(gpsX[i])
+                yGps.append(gpsY[i])
+                zGps.append(gpsZ[i])
                 negativeFlag = 1        # set negative flag to 1 to acknowledge are negatives
 
         # only perform further conversions and add to array of objects if negatives exist
