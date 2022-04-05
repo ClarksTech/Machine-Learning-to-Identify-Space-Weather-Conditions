@@ -36,12 +36,19 @@ PrePro.calculateIntersects(tecDataList)
 # Generate Intersection Lat and Lons
 PrePro.calculateIntersecsLatLon(tecDataList)
 
+#####################################################################
+################### Display Pre Processing Data #####################
+#####################################################################
+
+# Display Intersect Lat vs Delta
+while(1):
+    PrePro.displayIntersectsVsLat(tecDataList)
+
 # Display the Delta vs time
 PrePro.displayDeltaVsUtc(tecDataList)
 
-while(1):
-    # Display the Delta vs time specific
-    PrePro.displayDeltaVsUtcSpecific(tecDataList)
+# Display the Delta vs time specific
+PrePro.displayDeltaVsUtcSpecific(tecDataList)
 
 # Display the Delta on world map
 PrePro.displayTecDeltaWorldMap(tecDataList)

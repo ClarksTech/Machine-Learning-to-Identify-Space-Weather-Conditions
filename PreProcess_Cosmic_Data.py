@@ -75,17 +75,10 @@ def calculateIntersects(tecDataList):
             t0 = tca - thc                                      # scalar on ray path for P1
             t1 = tca + thc                                      # scalar on ray path for P2
 
-            # handle case where does not intersect the sphere by returning 0
-            if d > (6371000+350000):
-                # Generate final P1, P2, and Tp coordinated
-                p1 = [0, 0, 0]                                      # no intersect so return 0
-                p2 = [0, 0, 0]                                      # no intersect so return 0
-                tp = gpsCoordinate + tca*leoGpsVectorNormalised     # TP point coordinates
-            else:
-                # Generate final P1, P2, and Tp coordinated
-                p1 = gpsCoordinate + t0*leoGpsVectorNormalised      # first intersect coordinates
-                p2 = gpsCoordinate + t1*leoGpsVectorNormalised      # second intersect coordinates
-                tp = gpsCoordinate + tca*leoGpsVectorNormalised     # TP point coordinates
+            # Generate final P1, P2, and Tp coordinated
+            p1 = gpsCoordinate + t0*leoGpsVectorNormalised      # first intersect coordinates
+            p2 = gpsCoordinate + t1*leoGpsVectorNormalised      # second intersect coordinates
+            tp = gpsCoordinate + tca*leoGpsVectorNormalised     # TP point coordinates
 
             # append to arrays
             xP1.append(p1[0])
@@ -147,6 +140,34 @@ def calculateIntersecsLatLon(tecDataList):
         data.lonTp = lonTp
 
     print("Lat and Lons Calculated Successfully")
+    return()
+
+#####################################################################
+############# Function to display lat vs P1, P2, and TP #############
+#####################################################################
+def displayIntersectsVsLat(tecDataList):
+    print("Plotting intersects vs lat...")
+    # Plot delta vs P1 lat
+    for data in tecDataList:
+        plt.plot(data.latP1, data.delta)                                                        # plot delta vs P1 Lat
+        plt.ylabel("Delta between TEC Diff and Moving Average (TECU per Second)")               # label y axis
+        plt.xlabel("lat")                                                                       # label x axis
+        plt.title(f"Delta vs P1 Lat for LEO 1-6 PRN 1-32 on {data.utcTime[0].year}/{data.utcTime[0].month}/{data.utcTime[0].day}")  # title 
+    plt.show()
+        # Plot delta vs P2 lat
+    for data in tecDataList:
+        plt.plot(data.latP2, data.delta)                                                        # plot delta vs P2 Lat
+        plt.ylabel("Delta between TEC Diff and Moving Average (TECU per Second)")               # label y axis
+        plt.xlabel("lat")                                                                       # label x axis
+        plt.title(f"Delta vs P2 Lat for LEO 1-6 PRN 1-32 on {data.utcTime[0].year}/{data.utcTime[0].month}/{data.utcTime[0].day}")  # title 
+    plt.show()
+        # Plot delta vs Tp lat
+    for data in tecDataList:
+        plt.plot(data.latTp, data.delta)                                                        # plot delta vs Tp Lat
+        plt.ylabel("Delta between TEC Diff and Moving Average (TECU per Second)")               # label y axis
+        plt.xlabel("lat")                                                                       # label x axis
+        plt.title(f"Delta vs TP Lat for LEO 1-6 PRN 1-32 on {data.utcTime[0].year}/{data.utcTime[0].month}/{data.utcTime[0].day}")  # title 
+    plt.show()
     return()
 
 #####################################################################
