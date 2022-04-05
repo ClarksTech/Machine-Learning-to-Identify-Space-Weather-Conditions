@@ -12,7 +12,7 @@ class tecData(object):
     def __init__(self,leo=None, prn=None, antId=None, utcTime=None, tec=None, tecDiff=None, 
     lat=None, lon=None, elev=None, movingAv=None, delta=None, xLeo=None, yLeo=None, zLeo=None,
     xGps=None, yGps=None, zGps=None, xP1=None, yP1=None, zP1=None, xP2=None, yP2=None, zP2=None,
-    xTp=None, yTp=None, zTp=None):                               # define class and parameters
+    xTp=None, yTp=None, zTp=None, latP1=None, lonP1=None, latP2=None, lonP2=None, latTp=None, lonTp=None):  # define class and parameters
 
         self.leo = leo              # refrenced to self. for access to LEO
         self.prn = prn              # refrenced to self. for access to PRN  
@@ -40,6 +40,12 @@ class tecData(object):
         self.xTp = xTp              # refrenced to self. for access to coordinates in metres
         self.yTp = yTp              # refrenced to self. for access to coordinates in metres
         self.zTp = zTp              # refrenced to self. for access to coordinates in metres
+        self.latP1 = latP1          # refrenced to self. for access to lat and lon
+        self.lonP1 = lonP1          # refrenced to self. for access to lat and lon
+        self.latP2 = latP2          # refrenced to self. for access to lat and lon
+        self.lonP2 = lonP2          # refrenced to self. for access to lat and lon
+        self.latTp = latTp          # refrenced to self. for access to lat and lon
+        self.lonTp = lonTp          # refrenced to self. for access to lat and lon       
 
 #####################################################################
 ####### Count Number of Files to be loaded for progress bar #########
