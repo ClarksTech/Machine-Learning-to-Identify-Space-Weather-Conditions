@@ -33,6 +33,9 @@ PrePro.calculateDelta(tecDataList)
 # Generate Intersection coordinates
 PrePro.calculateIntersects(tecDataList)
 
+# Generate Intersection Lat and Lons
+PrePro.calculateIntersecsLatLon(tecDataList)
+
 # Display the Delta vs time
 PrePro.displayDeltaVsUtc(tecDataList)
 
