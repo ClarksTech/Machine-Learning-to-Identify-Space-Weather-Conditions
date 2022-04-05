@@ -2,6 +2,7 @@
 import matplotlib.pyplot as plt             # for plotting delta
 import numpy as np                          # for manipulating moving averages
 from mpl_toolkits.basemap import Basemap    # Map for plotting global data
+import pymap3d as pm                        # for LLA conversion
 
 #####################################################################
 ########### Function to obtain moving average of TEC Diff ###########
@@ -74,10 +75,17 @@ def calculateIntersects(tecDataList):
             t0 = tca - thc                                      # scalar on ray path for P1
             t1 = tca + thc                                      # scalar on ray path for P2
 
-            # Generate final P1, P2, and Tp coordinated
-            p1 = gpsCoordinate + t0*leoGpsVectorNormalised      # first intersect coordinates
-            p2 = gpsCoordinate + t1*leoGpsVectorNormalised      # second intersect coordinates
-            tp = gpsCoordinate + tca*leoGpsVectorNormalised     # TP point coordinates
+            # handle case where does not intersect the sphere by returning 0
+            if d > (6371000+350000):
+                # Generate final P1, P2, and Tp coordinated
+                p1 = [0, 0, 0]                                      # no intersect so return 0
+                p2 = [0, 0, 0]                                      # no intersect so return 0
+                tp = gpsCoordinate + tca*leoGpsVectorNormalised     # TP point coordinates
+            else:
+                # Generate final P1, P2, and Tp coordinated
+                p1 = gpsCoordinate + t0*leoGpsVectorNormalised      # first intersect coordinates
+                p2 = gpsCoordinate + t1*leoGpsVectorNormalised      # second intersect coordinates
+                tp = gpsCoordinate + tca*leoGpsVectorNormalised     # TP point coordinates
 
             # append to arrays
             xP1.append(p1[0])
@@ -102,6 +110,43 @@ def calculateIntersects(tecDataList):
         data.zTp = zTp
 
     print("Coordinates's Calculated Successfully")
+    return()
+
+#####################################################################
+########### Function to obtain P1, P2, and TP lat and lon ###########
+#####################################################################
+def calculateIntersecsLatLon(tecDataList):
+    print("Calculating P1, P2, and TP Lat and Lon...")
+    # repeat for every TEC Diff measurement for entire day
+    for data in tecDataList:
+
+        # setup as numpy arrays for single manipulations
+        xP1 = np.array(data.xP1)
+        yP1 = np.array(data.yP1)
+        zP1 = np.array(data.zP1)
+        xP2 = np.array(data.xP2)
+        yP2 = np.array(data.yP2)
+        zP2 = np.array(data.zP2)
+        xTp = np.array(data.xTp)
+        yTp = np.array(data.yTp)
+        zTp = np.array(data.zTp)
+
+        # convert to LLA
+        latP1, lonP1, altP1 = pm.ecef2geodetic(xP1, yP1, zP1, ell=None, deg=True)
+        # convert to LLA
+        latP2, lonP2, altP2 = pm.ecef2geodetic(xP2, yP2, zP2, ell=None, deg=True)
+        # convert to LLA
+        latTp, lonTp, altTp = pm.ecef2geodetic(xTp, yTp, zTp, ell=None, deg=True)
+
+        # store back in object
+        data.latP1 = latP1
+        data.lonP1 = lonP1
+        data.latP2 = latP2
+        data.lonP2 = lonP2
+        data.latTp = latTp
+        data.lonTp = lonTp
+
+    print("Lat and Lons Calculated Successfully")
     return()
 
 #####################################################################
