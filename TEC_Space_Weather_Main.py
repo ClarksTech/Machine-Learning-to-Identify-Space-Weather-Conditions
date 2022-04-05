@@ -41,8 +41,10 @@ PrePro.calculateIntersecsLatLon(tecDataList)
 #####################################################################
 
 # Display Intersect Lat vs Delta
-while(1):
-    PrePro.displayIntersectsVsLat(tecDataList)
+PrePro.displayIntersectsVsLat(tecDataList)
+
+#Display Delta at P2 on world map
+PrePro.displayTecDeltaWorldMapAtP2(tecDataList)
 
 # Display the Delta vs time
 PrePro.displayDeltaVsUtc(tecDataList)
