@@ -207,6 +207,42 @@ def displayIntersectsVsLatSpecific(tecDataList):
     return()
 
 #####################################################################
+######### Function to smooth and non-smooth TEC Diff vs Lat #########
+#####################################################################
+def displayTecDiffVsLatSpecific(tecDataList):
+    print("Plotting TEC Diff vs lat for specific links...")
+    # Get specific LEO and PRN ID
+    print("Enter LEO ID to display: ")      # prompt user to enter LEO ID
+    displayLeo = int(input())               # capture LEO ID
+    print("Enter PRN ID to display: ")      # prompt user to enter PRN ID
+    displayPrn = int(input())               # prompt user to enter PRN ID
+    # Plot delta vs P1 lat
+    for data in tecDataList:
+        if data.leo == displayLeo and data.prn == displayPrn and data.utcTime[0].hour == 8 and data.utcTime[0].minute >= 30:   # only LEO and PRN ID for given antenna to avoid double readings
+            plt.plot(data.latP1, data.tecDiff)                                                        # plot delta vs P1 Lat
+            plt.ylabel("TEC Diff (TECU per Second)")               # label y axis
+            plt.xlabel("lat")                                                                       # label x axis
+            plt.title(f"TEC Diff vs P1 Lat for LEO {displayLeo} PRN {displayPrn} on {data.utcTime[0].year}/{data.utcTime[0].month}/{data.utcTime[0].day}")  # title 
+    plt.show()
+        # Plot delta vs P2 lat
+    for data in tecDataList:
+        if data.leo == displayLeo and data.prn == displayPrn and data.utcTime[0].hour == 8 and data.utcTime[0].minute >= 30:   # only LEO and PRN ID for given antenna to avoid double readings
+            plt.plot(data.latP2, data.tecDiff)                                                        # plot delta vs P2 Lat
+            plt.ylabel("TEC Diff (TECU per Second)")               # label y axis
+            plt.xlabel("lat")                                                                       # label x axis
+            plt.title(f"TEC Diff vs P2 Lat for LEO {displayLeo} PRN {displayPrn} on {data.utcTime[0].year}/{data.utcTime[0].month}/{data.utcTime[0].day}")  # title 
+    plt.show()
+        # Plot delta vs Tp lat
+    for data in tecDataList:
+        if data.leo == displayLeo and data.prn == displayPrn and data.utcTime[0].hour == 8 and data.utcTime[0].minute >= 30:   # only LEO and PRN ID for given antenna to avoid double readings
+            plt.plot(data.latTp, data.tecDiff)                                                        # plot delta vs Tp Lat
+            plt.ylabel("TEC Diff (TECU per Second)")               # label y axis
+            plt.xlabel("lat")                                                                       # label x axis
+            plt.title(f"TEC Diff vs TP Lat for LEO {displayLeo} PRN {displayPrn} on {data.utcTime[0].year}/{data.utcTime[0].month}/{data.utcTime[0].day}")  # title 
+    plt.show()
+    return()
+
+#####################################################################
 ## Function to display distance between intersect points P1, P2, TP #
 #####################################################################
 def displayIntersectDist(tecDataList):

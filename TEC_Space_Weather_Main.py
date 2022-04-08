@@ -40,6 +40,9 @@ PrePro.calculateIntersecsLatLon(tecDataList)
 ################### Display Pre Processing Data #####################
 #####################################################################
 
+# Display Smooth and non-smooth vs Lat (smooth = 8 hour 30 for LEO 1 PRN 1, noisy = )
+PrePro.displayTecDiffVsLatSpecific(tecDataList)
+
 # Display each measurement distances to validate geometry and intersect point seclection
 PrePro.displayIntersectDist(tecDataList)
 
