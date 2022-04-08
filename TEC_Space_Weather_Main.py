@@ -40,7 +40,11 @@ PrePro.calculateIntersecsLatLon(tecDataList)
 ################### Display Pre Processing Data #####################
 #####################################################################
 
-#Display Delta at P2 on world map per hour
+# Display intersect sor specific satellites vs lat
+while(1):
+    PrePro.displayIntersectsVsLatSpecific(tecDataList)
+
+# Display Delta at P2 on world map per hour
 PrePro.displayTecDeltaWorldMapAtP2PerHr(tecDataList)
 
 # Display Intersect Lat vs Delta

@@ -171,6 +171,42 @@ def displayIntersectsVsLat(tecDataList):
     return()
 
 #####################################################################
+#### Function to display lat vs P1, P2, and TP specific LEO PRN #####
+#####################################################################
+def displayIntersectsVsLatSpecific(tecDataList):
+    print("Plotting intersects vs lat for specific links...")
+    # Get specific LEO and PRN ID
+    print("Enter LEO ID to display: ")      # prompt user to enter LEO ID
+    displayLeo = int(input())               # capture LEO ID
+    print("Enter PRN ID to display: ")      # prompt user to enter PRN ID
+    displayPrn = int(input())               # prompt user to enter PRN ID
+    # Plot delta vs P1 lat
+    for data in tecDataList:
+        if data.leo == displayLeo and data.prn == displayPrn:   # only LEO and PRN ID for given antenna to avoid double readings
+            plt.plot(data.latP1, data.delta)                                                        # plot delta vs P1 Lat
+            plt.ylabel("Delta between TEC Diff and Moving Average (TECU per Second)")               # label y axis
+            plt.xlabel("lat")                                                                       # label x axis
+            plt.title(f"Delta vs P1 Lat for LEO {displayLeo} PRN {displayPrn} on {data.utcTime[0].year}/{data.utcTime[0].month}/{data.utcTime[0].day}")  # title 
+    plt.show()
+        # Plot delta vs P2 lat
+    for data in tecDataList:
+        if data.leo == displayLeo and data.prn == displayPrn:   # only LEO and PRN ID for given antenna to avoid double readings
+            plt.plot(data.latP2, data.delta)                                                        # plot delta vs P2 Lat
+            plt.ylabel("Delta between TEC Diff and Moving Average (TECU per Second)")               # label y axis
+            plt.xlabel("lat")                                                                       # label x axis
+            plt.title(f"Delta vs P2 Lat for LEO {displayLeo} PRN {displayPrn} on {data.utcTime[0].year}/{data.utcTime[0].month}/{data.utcTime[0].day}")  # title 
+    plt.show()
+        # Plot delta vs Tp lat
+    for data in tecDataList:
+        if data.leo == displayLeo and data.prn == displayPrn:   # only LEO and PRN ID for given antenna to avoid double readings
+            plt.plot(data.latTp, data.delta)                                                        # plot delta vs Tp Lat
+            plt.ylabel("Delta between TEC Diff and Moving Average (TECU per Second)")               # label y axis
+            plt.xlabel("lat")                                                                       # label x axis
+            plt.title(f"Delta vs TP Lat for LEO {displayLeo} PRN {displayPrn} on {data.utcTime[0].year}/{data.utcTime[0].month}/{data.utcTime[0].day}")  # title 
+    plt.show()
+    return()
+
+#####################################################################
 ############## Function to display Delta vs UTC time ################
 #####################################################################
 def displayDeltaVsUtc(tecDataList):
@@ -197,7 +233,7 @@ def displayDeltaVsUtcSpecific(tecDataList):
 
     # search list and only plot if is specified LEO and PRN ID
     for data in tecDataList:
-        if data.leo == displayLeo and data.prn == displayPrn:   # only LEO and PRN ID for given antenna to avoid double readings
+        if data.leo == displayLeo and data.prn == displayPrn:   # only LEO and PRN ID
             plt.plot(data.utcTime, data.delta)                  # plot time vs TEC
 
     plt.ylabel("Delta between TEC Diff and Moving Average (TECU per Second")    # label y axis
