@@ -40,6 +40,9 @@ PrePro.calculateIntersecsLatLon(tecDataList)
 ################### Display Pre Processing Data #####################
 #####################################################################
 
+# Display each measurement distances to validate geometry and intersect point seclection
+PrePro.displayIntersectDist(tecDataList)
+
 # Display intersect sor specific satellites vs lat
 while(1):
     PrePro.displayIntersectsVsLatSpecific(tecDataList)

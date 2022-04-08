@@ -207,6 +207,34 @@ def displayIntersectsVsLatSpecific(tecDataList):
     return()
 
 #####################################################################
+## Function to display distance between intersect points P1, P2, TP #
+#####################################################################
+def displayIntersectDist(tecDataList):
+    print("Plotting intersect distances for specific links...")
+    # Get specific LEO and PRN ID
+    print("Enter LEO ID to display: ")      # prompt user to enter LEO ID
+    displayLeo = int(input())               # capture LEO ID
+    print("Enter PRN ID to display: ")      # prompt user to enter PRN ID
+    displayPrn = int(input())               # prompt user to enter PRN ID
+    # Plot delta vs P1 lat
+    for data in tecDataList:
+        if data.leo == displayLeo and data.prn == displayPrn:   # only LEO and PRN ID
+            for x in range(len(data.xLeo)):
+                print("Press enter:")
+                nan = input()
+                leoP1Dist = np.sqrt((data.xLeo[x]-data.xGps[x])**2 + (data.yLeo[x]-data.yGps[x])**2 + (data.zLeo[x]-data.zGps[x])**2)
+                print(f"Leo to P1: {leoP1Dist}")
+                p1TpDist = np.sqrt((data.xP1[x]-data.xTp[x])**2 + (data.yP1[x]-data.yTp[x])**2 + (data.zP1[x]-data.zTp[x])**2)
+                print(f"P1 to TP: {p1TpDist}")
+                tpP2Dist = np.sqrt((data.xTp[x]-data.xP2[x])**2 + (data.yTp[x]-data.yP2[x])**2 + (data.zTp[x]-data.zP2[x])**2)
+                print(f"Tp to P2: {tpP2Dist}")
+                p1P2Dist = np.sqrt((data.xP1[x]-data.xP2[x])**2 + (data.yP1[x]-data.yP2[x])**2 + (data.zP1[x]-data.zP2[x])**2)
+                print(F"P1 to P2: {p1P2Dist}")
+                LeoP2Dist = np.sqrt((data.xLeo[x]-data.xP2[x])**2 + (data.yLeo[x]-data.yP2[x])**2 + (data.zLeo[x]-data.zP2[x])**2)
+                print(f"Leo to P2: {LeoP2Dist}")
+    return()
+
+#####################################################################
 ############## Function to display Delta vs UTC time ################
 #####################################################################
 def displayDeltaVsUtc(tecDataList):
