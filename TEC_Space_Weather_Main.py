@@ -42,7 +42,10 @@ PrePro.calculateIntersecsLatLon(tecDataList)
 #####################################################################
 
 # Function to run lat lon algorithm and store final data values
-Pros.importProcessedDataToClassList(tecDataList)
+processedTecDataList = Pros.importProcessedDataToClassList(tecDataList)
+
+# Display Proccessed TEC Delta on world map per hour
+Pros.displayProcessedTecDeltaWorldMapPerHr(processedTecDataList)
 
 #####################################################################
 ################### Display Pre Processing Data #####################

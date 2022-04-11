@@ -1,5 +1,7 @@
 # Import Libraries
 import numpy as np
+from mpl_toolkits.basemap import Basemap    # Map for plotting global data
+import matplotlib.pyplot as plt             # for plotting delta
 
 #####################################################################
 ############ Class to Hold Processed TEC for each LEO ###############
@@ -116,4 +118,34 @@ def importProcessedDataToClassList(tecDataList):
         
             processedTecDataList.append(processedTecData(tec=tec, tecDiff=tecDiff, tecDelta=tecDelta, lat=lat, lon=lon, utcTime=utcTime))   # Populate Object and add to array of objects
     print("Processed Data Loaded into Object Successfully!")
+    return(processedTecDataList)
+
+#####################################################################
+### Function to display processed TEC Delta on World Map Per Hour ###
+#####################################################################
+def displayProcessedTecDeltaWorldMapPerHr(processedTecDataList):
+    for hour in range(0, 24):
+        print(f"Drawing World Map of Processed Delta at Hour {hour}...")
+        map = Basemap()                                                                             # Using basemap as basis for world map
+        map.drawcoastlines()                                                                        # Only add the costal lines to the map for visual refrence
+        map.drawparallels(np.arange(-90,90,30),labels=[1,1,0,1], fontsize=8)                        # Add Longitude lines and degree labels
+        map.drawmeridians(np.arange(-180,180,30),labels=[1,1,0,1], rotation=45, fontsize=8)         # Add latitude lines and degree labels
+
+        # repeat for every TEC measurement for entire day
+        for data in processedTecDataList:
+            lon = []
+            lat = []
+            delta = []
+            for i in range(len(data.utcTime)):
+                if data.utcTime[i].hour == hour:
+                    lon.append(data.lon[i])
+                    lat.append(data.lat[i])
+                    delta.append(data.tecDelta[i])
+            map.scatter(lon, lat, latlon=True, c=delta, s=10, cmap='RdBu_r', alpha=0.2)                # Plot as a scatter where shade of red depends on TEC Diff value
+        plt.colorbar(label='TECU per Second')                                                                   # Add coloutbar key for TECu Shades of red
+        plt.clim(-5,5)                                                                                          # Key from 0 to 1000 (max TEC Diff measurement ~+-50)
+        plt.xlabel('Longitude', labelpad=40, fontsize=8)                                                        # Add x axis label
+        plt.ylabel('Latitude', labelpad=40, fontsize=8)                                                         # Add y axis label
+        plt.title(f'Processed COSMIC 2 TEC Delta plot on global map on {data.utcTime[0].year}/{data.utcTime[0].month}/{data.utcTime[0].day} Hour:{hour}', fontsize=8)  # Add title
+        plt.show()
     return()
