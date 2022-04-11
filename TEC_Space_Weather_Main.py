@@ -2,6 +2,7 @@
 import Import_Cosmic_Data as Data
 import Display_Cosmic_Data as Display
 import PreProcess_Cosmic_Data as PrePro
+import Processed_Cosmic_Data as Pros
 
 #####################################################################
 ####################### Main Program Script #########################
@@ -35,6 +36,13 @@ PrePro.calculateIntersects(tecDataList)
 
 # Generate Intersection Lat and Lons
 PrePro.calculateIntersecsLatLon(tecDataList)
+
+#####################################################################
+################### Store Final Processed Data ######################
+#####################################################################
+
+# Function to run lat lon algorithm and store final data values
+Pros.importProcessedDataToClassList(tecDataList)
 
 #####################################################################
 ################### Display Pre Processing Data #####################
