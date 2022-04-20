@@ -2,6 +2,8 @@
 import numpy as np
 from mpl_toolkits.basemap import Basemap    # Map for plotting global data
 import matplotlib.pyplot as plt             # for plotting delta
+import statistics as stat                   # for calculating standard deviation of pixels
+import pandas as pd
 
 #####################################################################
 ############ Class to Hold Processed TEC for each LEO ###############
@@ -148,4 +150,59 @@ def displayProcessedTecDeltaWorldMapPerHr(processedTecDataList):
         plt.ylabel('Latitude', labelpad=40, fontsize=8)                                                         # Add y axis label
         plt.title(f'Processed COSMIC 2 TEC Delta plot on global map on {data.utcTime[0].year}/{data.utcTime[0].month}/{data.utcTime[0].day} Hour:{hour}', fontsize=8)  # Add title
         plt.show()
+    return()
+
+#####################################################################
+##### Function to populate processed TEC Delta pixels per hour ######
+#####################################################################
+def populateProcessedTecDeltaPixelPerHr(processedTecDataList, hour):
+    # lists to store the specific hours data
+    lon = []
+    lat = []
+    delta = []
+    # repeat for every TEC measurement for entire day
+    for data in processedTecDataList:
+        for i in range(len(data.utcTime)):
+            if data.utcTime[i].hour == hour:
+                lon.append(data.lon[i])
+                lat.append(data.lat[i])
+                delta.append(data.tecDelta[i])
+    # create empty 2D list of lists to store pixel standard deviation
+    processedDataPixelArray = []
+    for i in range(4):
+        processedDataPixelArray.append([])
+    y = 3
+    # itterate through all pixels in lat and lon 20 degree steps
+    for latStart in range(-40, 40, 20):
+        for lonStart in range(-180, 180, 20):
+            pixel = []  # empty list to store all values of delta TEC in the current pixel
+            # Only add to current pixel list if the point satisfies the location conditions
+            for i in range(len(delta)):
+                if (lat[i] >= latStart) and (lat[i] < (latStart+20)) and (lon[i] >= lonStart) and (lon[i] < (lonStart+20)):
+                    pixel.append(delta[i])
+            # calculate standard deviation for entire pixel
+            if not pixel:
+                # empty list Standard Deviation set to None
+                processedDataPixelArray[y].append(None)
+            else:
+                # not empty list calculate standard deviation and add to list of lists
+                standarDeviationOfPixel = stat.pstdev(pixel)
+                processedDataPixelArray[y].append(standarDeviationOfPixel)
+        y -= 1  # decrement row counter
+
+    return(processedDataPixelArray) # return populated list of lists for the hours standard deviation of delta TEC
+
+#####################################################################
+######### Function to save TEC delta Pixels per Hr as CSV ###########
+#####################################################################
+def saveProcessedTecDeltaPixelPerHr(processedTecDataList):
+    # Generate and Store Pixel Array as CSV for each hour of the day
+    for hour in range(0, 24, 1):
+        progress = hour/23 * 100
+        print("Progress of Conversion to Pixel CSV files: %.2f" %progress, "%",end='\r')
+        processedDataPixelArray = populateProcessedTecDeltaPixelPerHr(processedTecDataList, hour)  # get list of lists with pixel array data
+        pixelArray = np.array(processedDataPixelArray)                                                  # convert to numpy array for easier manipulation
+        # store as CSV file so can be accessed by ML model easiy and generation only needed once
+        pd.DataFrame(pixelArray).to_csv(f'../FYP_pixelArrayCSV/{processedTecDataList[0].utcTime[0].year}_{processedTecDataList[0].utcTime[0].month}_{processedTecDataList[0].utcTime[0].day}_{hour}.csv', index=False)
+    print("Progress of Conversion to Pixel CSV files: 100 % - CSV Export Complete")
     return()

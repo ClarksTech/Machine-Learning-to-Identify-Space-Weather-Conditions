@@ -1,4 +1,5 @@
 # include required libraries
+from cmath import nan
 import matplotlib.pyplot as plt             # for plotting delta
 import numpy as np                          # for manipulating moving averages
 from mpl_toolkits.basemap import Basemap    # Map for plotting global data
@@ -71,7 +72,11 @@ def calculateIntersects(tecDataList):
             gpsEarthVector = [earthCoordinate[0]-gpsCoordinate[0], earthCoordinate[1]-gpsCoordinate[1], earthCoordinate[2]-gpsCoordinate[2]]    # vector from GPS satellite to earth centre
             tca = np.dot(gpsEarthVector, leoGpsVectorNormalised)                        # tca is distance to TP point along ray path
             d = np.sqrt((np.dot(gpsEarthVector, gpsEarthVector) - np.dot(tca, tca)))    # d is distance from centre of earth to ray path (orthodonal)
-            thc = np.sqrt(((6371000+350000)**2)-d**2)                                   # thc is distance between TP point and P1 along ray path
+            # check for non-intersect
+            if d**2 > ((6371000+350000)**2):
+                thc = np.nan
+            else:
+                thc = np.sqrt(((6371000+350000)**2)-d**2)                                   # thc is distance between TP point and P1 along ray path
             t0 = tca - thc                                      # scalar on ray path for P1
             t1 = tca + thc                                      # scalar on ray path for P2
 

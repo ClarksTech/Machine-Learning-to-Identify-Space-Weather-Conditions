@@ -44,6 +44,9 @@ PrePro.calculateIntersecsLatLon(tecDataList)
 # Function to run lat lon algorithm and store final data values
 processedTecDataList = Pros.importProcessedDataToClassList(tecDataList)
 
+# Generate and Store Pixel Array as CSV for each hour of the day
+Pros.saveProcessedTecDeltaPixelPerHr(processedTecDataList)
+
 # Display Proccessed TEC Delta on world map per hour
 Pros.displayProcessedTecDeltaWorldMapPerHr(processedTecDataList)
 
@@ -106,22 +109,3 @@ Display.displayTecVsUtc(tecDataList)
 
 # Display TEC vs UTC time for specific PRN and LEO ID
 Display.displayTecVsUtcSpecific(tecDataList)
-
-
-
-
-## debug large TEC variations in 1s
-#print("identifying large TEC DIFF...")
-#for data in tecDataList:
-#    for tDiff in data.tecDiff:
-#        if abs(tDiff) > 20:
-#            print("Large TEC diff of ", tDiff, " LEO ID: ", data.leo, " PRN ID: ", data.prn)
-
-## Find out how many points populate a 30 deg by 30 deg square
-#print("Calculating how many datapoints in 30 by 30 degree square...")
-#count = 0
-#for data in tecDataList:
-#    for i in range(len(data.lat)):
-#        if 0 <= data.lat[i] <= 15 and 0 <= data.lon[i] <= 15 :
-#            count += 1
-#print("Data Points in a 30 by 30 degree square = ", count)
