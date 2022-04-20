@@ -26,7 +26,7 @@ if len(dir) == 0:
     # Download whole of 2020 data files
     for day in range(32, 367, 1):
         # progress bar
-        progress = ((day-32)/367-32) * 100
+        progress = ((day-32)/(367-32)) * 100
         print("Progress of Data Download: %.2f" %progress, "%",end='\r')
 
         url = f'https://data.cosmic.ucar.edu/gnss-ro/cosmic2/postProc/level1b/2020/{day:03d}/podTc2_postProc_2020_{day:03d}.tar.gz' # url to download with variable day
