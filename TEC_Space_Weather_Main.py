@@ -3,11 +3,42 @@ import Import_Cosmic_Data as Data
 import Display_Cosmic_Data as Display
 import PreProcess_Cosmic_Data as PrePro
 import Processed_Cosmic_Data as Pros
+import urllib.request
+import tarfile
+import os
 
 #####################################################################
 ####################### Main Program Script #########################
 #####################################################################
 print("Starting Program...")
+
+#####################################################################
+################### Download the COSMIC 2 Data ######################
+#####################################################################
+# Check if path is empty and Files need downloading:
+path = '../FYP_Data'        # path of the directory 
+dir = os.listdir(path)      # Getting the list of directories
+  
+# Checking if the list is empty or not and download any required files
+if len(dir) == 0:
+    print("Directory Empty - Files Need Downloading")
+    print("Downloading the Data Files...")
+    # Download whole of 2020 data files
+    for day in range(32, 366, 1):
+        url = f'https://data.cosmic.ucar.edu/gnss-ro/cosmic2/postProc/level1b/2020/{day:03d}/podTc2_postProc_2020_{day:03d}.tar.gz' # url to download with variable day
+        downloaded_filename = f'../FYP_Data/podTc2_postProc_2020_{day:03d}.tar.gz'                                                  # name and location of downloaded file
+        urllib.request.urlretrieve(url, downloaded_filename)                                                                        # curl to download the file
+
+        # Extract the downloaded file
+        fname = f'../FYP_Data/podTc2_postProc_2020_{day:03d}.tar.gz'        # name of the file to be extracted
+        if fname.endswith("tar.gz"):                                        # so long as ends in correct format perform the extraction
+            tar = tarfile.open(fname, "r:gz")                               # open the tar.gz file
+            tar.extractall(f'../FYP_Data/podTc2_postProc_2020_{day:03d}')   # extract all to a new folder of same name
+            tar.close()                                                     # close file
+        os.remove(f'../FYP_Data/podTc2_postProc_2020_{day:03d}.tar.gz')     # delete non-extracted version of the file
+    print("Data Files Downloaded and Extracted!")
+else:
+    print("Directory Populated - No Files Need Downloading")                # if files exist in data folder then no need to download
 
 #####################################################################
 #################### Import the COSMIC 2 Data #######################
