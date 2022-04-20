@@ -24,7 +24,11 @@ if len(dir) == 0:
     print("Directory Empty - Files Need Downloading")
     print("Downloading the Data Files...")
     # Download whole of 2020 data files
-    for day in range(32, 366, 1):
+    for day in range(32, 367, 1):
+        # progress bar
+        progress = ((day-32)/367-32) * 100
+        print("Progress of Data Download: %.2f" %progress, "%",end='\r')
+
         url = f'https://data.cosmic.ucar.edu/gnss-ro/cosmic2/postProc/level1b/2020/{day:03d}/podTc2_postProc_2020_{day:03d}.tar.gz' # url to download with variable day
         downloaded_filename = f'../FYP_Data/podTc2_postProc_2020_{day:03d}.tar.gz'                                                  # name and location of downloaded file
         urllib.request.urlretrieve(url, downloaded_filename)                                                                        # curl to download the file
@@ -36,7 +40,7 @@ if len(dir) == 0:
             tar.extractall(f'../FYP_Data/podTc2_postProc_2020_{day:03d}')   # extract all to a new folder of same name
             tar.close()                                                     # close file
         os.remove(f'../FYP_Data/podTc2_postProc_2020_{day:03d}.tar.gz')     # delete non-extracted version of the file
-    print("Data Files Downloaded and Extracted!")
+    print("Progress of Data Download: 100% - Data Files Downloaded and Extracted!")
 else:
     print("Directory Populated - No Files Need Downloading")                # if files exist in data folder then no need to download
 
