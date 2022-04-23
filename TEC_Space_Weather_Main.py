@@ -1,11 +1,11 @@
 # include required files
-import Import_Cosmic_Data as Data
-import Display_Cosmic_Data as Display
-import PreProcess_Cosmic_Data as PrePro
-import Processed_Cosmic_Data as Pros
-import urllib.request
-import tarfile
-import os
+import Import_Cosmic_Data as Data           # import the data script to get data
+import Display_Cosmic_Data as Display       # import the display script to allow display of results
+import PreProcess_Cosmic_Data as PrePro     # import the pre-processing script to process data
+import Processed_Cosmic_Data as Pros        # import the processed data script to produce CSV files
+import urllib.request                       # import library to web scrape the data download
+import tarfile                              # import library to unzip the data
+import os                                   # import library to allow deletion of files
 
 #####################################################################
 ####################### Main Program Script #########################
