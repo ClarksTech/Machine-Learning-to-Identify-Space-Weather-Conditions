@@ -11,6 +11,7 @@ import os
 ####################### Main Program Script #########################
 #####################################################################
 print("Starting Program...")
+print("Warning - Requires 200GB Space available...")
 
 #####################################################################
 ################### Download the COSMIC 2 Data ######################
@@ -20,7 +21,7 @@ path = '../FYP_Data'        # path of the directory
 dir = os.listdir(path)      # Getting the list of directories
   
 # Checking if the list is empty or not and download any required files
-if len(dir) < 366:
+if len(dir) < (366 - 32):
     print("Directory Empty - Files Need Downloading")
     print("Downloading the Data Files...")
     start = len(dir) + 32
@@ -57,7 +58,7 @@ for day in range(32, 367, 1):
     #################### Import the COSMIC 2 Data #######################
     #####################################################################
     # directory where data is held
-    directoryPath = "C:\\Users\\crutt\\Documents\\University\\Final Year Project\\FYP_Data\\podTc2_postProc_2020_{day:03d}"   # Directory path containing Data
+    directoryPath = f'/FYP_Data/podTc2_postProc_2020_{day:03d}'   # Directory path containing Data
 
     # Determine number of files to be imported
     numberOfFiles = Data.getNumFiles(directoryPath)
