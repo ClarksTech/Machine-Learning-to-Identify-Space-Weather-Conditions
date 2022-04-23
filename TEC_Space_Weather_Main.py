@@ -111,7 +111,9 @@ else:
 #####################################################################
 ################# Load all CSV files for ML input ###################
 #####################################################################
-GMM.loadCSVData('../FYP_pixelArrayCSV')
+cosmic2MlInputArray = GMM.loadCSVData('../FYP_pixelArrayCSV')
+
+GMM.trainGMM(cosmic2MlInputArray)
 
 
 
