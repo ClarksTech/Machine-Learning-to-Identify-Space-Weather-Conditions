@@ -16,83 +16,97 @@ print("Warning - Requires 200GB Space available...")
 #####################################################################
 ################### Download the COSMIC 2 Data ######################
 #####################################################################
-# Check if path is empty and Files need downloading:
-path = '../FYP_Data'        # path of the directory 
-dir = os.listdir(path)      # Getting the list of directories
-  
-# Checking if the list is empty or not and download any required files
-if len(dir) < (366 - 32):
-    print("Directory Empty - Files Need Downloading")
-    print("Downloading the Data Files...")
-    start = len(dir) + 32
-    # Download whole of 2020 data files
-    for day in range(start, 367, 1):
+
+# Check if CSV folder is populated, if so no further action needed pre ML model
+csvPath = '../FYP_pixelArrayCSV'    # directory Path
+csvDir = os.listdir(csvPath)        # list of all directories in path (0 if is empty)
+
+# check if CSV path is empty
+if len(csvDir) == 0:
+    # If is empty need to produce CSV files
+    print('CSV files not found - Need Producing!')
+    
+    # Check if data path is empty and Files need downloading:
+    dataPath = '../FYP_Data'        # path of the directory 
+    dataDir = os.listdir(dataPath)      # Getting the list of directories
+
+    # Checking if the data file list is empty or not and download any required files
+    if len(dataDir) < (366 - 32):
+        print("Data Directory Empty - Files Need Downloading")
+        print("Downloading the Data Files...")
+        start = len(dataDir) + 32
+        # Download whole of 2020 data files
+        for day in range(start, 367, 1):
+            # progress bar
+            progress = ((day-32)/(367-32)) * 100
+            print("Progress of Data Download: %.2f" %progress, "%",end='\r')
+
+            url = f'https://data.cosmic.ucar.edu/gnss-ro/cosmic2/postProc/level1b/2020/{day:03d}/podTc2_postProc_2020_{day:03d}.tar.gz' # url to download with variable day
+            downloaded_filename = f'../FYP_Data/podTc2_postProc_2020_{day:03d}.tar.gz'                                                  # name and location of downloaded file
+            urllib.request.urlretrieve(url, downloaded_filename)                                                                        # curl to download the file
+
+            # Extract the downloaded file
+            fname = f'../FYP_Data/podTc2_postProc_2020_{day:03d}.tar.gz'        # name of the file to be extracted
+            if fname.endswith("tar.gz"):                                        # so long as ends in correct format perform the extraction
+                tar = tarfile.open(fname, "r:gz")                               # open the tar.gz file
+                tar.extractall(f'../FYP_Data/podTc2_postProc_2020_{day:03d}')   # extract all to a new folder of same name
+                tar.close()                                                     # close file
+            os.remove(f'../FYP_Data/podTc2_postProc_2020_{day:03d}.tar.gz')     # delete non-extracted version of the file
+        print("Progress of Data Download: 100% - Data Files Downloaded and Extracted!")
+    else:
+        print("Data Directory Populated - No Files Need Downloading")                # if files exist in data folder then no need to download
+
+    #####################################################################
+    ## Generate all CSV files containing Pixel Data for the year 2020 ###
+    #####################################################################
+    for day in range(32, 367, 1):
         # progress bar
         progress = ((day-32)/(367-32)) * 100
-        print("Progress of Data Download: %.2f" %progress, "%",end='\r')
+        print("Progress of CSV Export: %.2f" %progress, "%",end='\r')
 
-        url = f'https://data.cosmic.ucar.edu/gnss-ro/cosmic2/postProc/level1b/2020/{day:03d}/podTc2_postProc_2020_{day:03d}.tar.gz' # url to download with variable day
-        downloaded_filename = f'../FYP_Data/podTc2_postProc_2020_{day:03d}.tar.gz'                                                  # name and location of downloaded file
-        urllib.request.urlretrieve(url, downloaded_filename)                                                                        # curl to download the file
+        #####################################################################
+        #################### Import the COSMIC 2 Data #######################
+        #####################################################################
+        # directory where data is held
+        directoryPath = f'/FYP_Data/podTc2_postProc_2020_{day:03d}'   # Directory path containing Data
 
-        # Extract the downloaded file
-        fname = f'../FYP_Data/podTc2_postProc_2020_{day:03d}.tar.gz'        # name of the file to be extracted
-        if fname.endswith("tar.gz"):                                        # so long as ends in correct format perform the extraction
-            tar = tarfile.open(fname, "r:gz")                               # open the tar.gz file
-            tar.extractall(f'../FYP_Data/podTc2_postProc_2020_{day:03d}')   # extract all to a new folder of same name
-            tar.close()                                                     # close file
-        os.remove(f'../FYP_Data/podTc2_postProc_2020_{day:03d}.tar.gz')     # delete non-extracted version of the file
-    print("Progress of Data Download: 100% - Data Files Downloaded and Extracted!")
+        # Determine number of files to be imported
+        numberOfFiles = Data.getNumFiles(directoryPath)
+
+        # Import files to Class list for easy data access
+        tecDataList = Data.importDataToClassList(directoryPath, numberOfFiles)
+
+        #####################################################################
+        ################# Perform Pre Processing on Data ####################
+        #####################################################################
+
+        # Generate moving averages test
+        PrePro.calculateMovingAverages(tecDataList)
+
+        # Generate difference between moving average and Tec Diff
+        PrePro.calculateDelta(tecDataList)
+
+        # Generate Intersection coordinates
+        PrePro.calculateIntersects(tecDataList)
+
+        # Generate Intersection Lat and Lons
+        PrePro.calculateIntersecsLatLon(tecDataList)
+
+        #####################################################################
+        ################### Store Final Processed Data ######################
+        #####################################################################
+
+        # Function to run lat lon algorithm and store final data values
+        processedTecDataList = Pros.importProcessedDataToClassList(tecDataList)
+
+        # Generate and Store Pixel Array as CSV for each hour of the day
+        Pros.saveProcessedTecDeltaPixelPerHr(processedTecDataList)
+
+    print("Progress of CSV Export: 100% - All CSV files with Pixel Data produced for 2020!")
+
 else:
-    print("Directory Populated - No Files Need Downloading")                # if files exist in data folder then no need to download
+    print('CSV Files Exist - No Need To Produce')
 
-#####################################################################
-## Generate all CSV files containing Pixel Data for the year 2020 ###
-#####################################################################
-for day in range(32, 367, 1):
-    # progress bar
-    progress = ((day-32)/(367-32)) * 100
-    print("Progress of CSV Export: %.2f" %progress, "%",end='\r')
-
-    #####################################################################
-    #################### Import the COSMIC 2 Data #######################
-    #####################################################################
-    # directory where data is held
-    directoryPath = f'/FYP_Data/podTc2_postProc_2020_{day:03d}'   # Directory path containing Data
-
-    # Determine number of files to be imported
-    numberOfFiles = Data.getNumFiles(directoryPath)
-
-    # Import files to Class list for easy data access
-    tecDataList = Data.importDataToClassList(directoryPath, numberOfFiles)
-
-    #####################################################################
-    ################# Perform Pre Processing on Data ####################
-    #####################################################################
-
-    # Generate moving averages test
-    PrePro.calculateMovingAverages(tecDataList)
-
-    # Generate difference between moving average and Tec Diff
-    PrePro.calculateDelta(tecDataList)
-
-    # Generate Intersection coordinates
-    PrePro.calculateIntersects(tecDataList)
-
-    # Generate Intersection Lat and Lons
-    PrePro.calculateIntersecsLatLon(tecDataList)
-
-    #####################################################################
-    ################### Store Final Processed Data ######################
-    #####################################################################
-
-    # Function to run lat lon algorithm and store final data values
-    processedTecDataList = Pros.importProcessedDataToClassList(tecDataList)
-
-    # Generate and Store Pixel Array as CSV for each hour of the day
-    Pros.saveProcessedTecDeltaPixelPerHr(processedTecDataList)
-
-print("Progress of CSV Export: 100% - All CSV files with Pixel Data produced for 2020!")
 
 ## Display Proccessed TEC Delta on world map per hour
 #Pros.displayProcessedTecDeltaWorldMapPerHr(processedTecDataList)
