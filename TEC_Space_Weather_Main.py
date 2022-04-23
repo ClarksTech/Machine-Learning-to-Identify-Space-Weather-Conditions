@@ -36,7 +36,7 @@ if len(csvDir) == 0:
         print("Downloading the Data Files...")
         start = len(dataDir) + 32
         # Download whole of 2020 data files
-        for day in range(start, 367, 1):
+        for day in range(32, 367, 1):
             # progress bar
             progress = ((day-32)/(367-32)) * 100
             print("Progress of Data Download: %.2f" %progress, "%",end='\r')
@@ -68,7 +68,7 @@ if len(csvDir) == 0:
         #################### Import the COSMIC 2 Data #######################
         #####################################################################
         # directory where data is held
-        directoryPath = f'/FYP_Data/podTc2_postProc_2020_{day:03d}'   # Directory path containing Data
+        directoryPath = f'../FYP_Data/podTc2_postProc_2020_{day:03d}'   # Directory path containing Data
 
         # Determine number of files to be imported
         numberOfFiles = Data.getNumFiles(directoryPath)
