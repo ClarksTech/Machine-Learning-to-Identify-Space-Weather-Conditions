@@ -1,11 +1,12 @@
 # include required files
-import Import_Cosmic_Data as Data           # import the data script to get data
-import Display_Cosmic_Data as Display       # import the display script to allow display of results
-import PreProcess_Cosmic_Data as PrePro     # import the pre-processing script to process data
-import Processed_Cosmic_Data as Pros        # import the processed data script to produce CSV files
-import urllib.request                       # import library to web scrape the data download
-import tarfile                              # import library to unzip the data
-import os                                   # import library to allow deletion of files
+import Import_Cosmic_Data as Data               # import the data script to get data
+import Display_Cosmic_Data as Display           # import the display script to allow display of results
+import PreProcess_Cosmic_Data as PrePro         # import the pre-processing script to process data
+import Processed_Cosmic_Data as Pros            # import the processed data script to produce CSV files
+import Gausian_Mixture_Model_Clustering as GMM  # import the machine learning script
+import urllib.request                           # import library to web scrape the data download
+import tarfile                                  # import library to unzip the data
+import os                                       # import library to allow deletion of files
 
 #####################################################################
 ####################### Main Program Script #########################
@@ -106,6 +107,16 @@ if len(csvDir) == 0:
 
 else:
     print('CSV Files Exist - No Need To Produce')
+
+#####################################################################
+################# Load all CSV files for ML input ###################
+#####################################################################
+GMM.loadCSVData('../FYP_pixelArrayCSV')
+
+
+
+
+
 
 
 ## Display Proccessed TEC Delta on world map per hour
