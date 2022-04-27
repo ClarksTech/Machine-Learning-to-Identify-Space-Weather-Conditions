@@ -3,7 +3,8 @@ import Import_Cosmic_Data as Data               # import the data script to get 
 import Display_Cosmic_Data as Display           # import the display script to allow display of results
 import PreProcess_Cosmic_Data as PrePro         # import the pre-processing script to process data
 import Processed_Cosmic_Data as Pros            # import the processed data script to produce CSV files
-import Gausian_Mixture_Model_Clustering as GMM  # import the machine learning script
+import Gaussian_Mixture_Model_Clustering as GMM  # import the machine learning script
+import Gaussian_Mixture_Model_Clustering_2 as GMM2  # import the machine learning script
 import urllib.request                           # import library to web scrape the data download
 import tarfile                                  # import library to unzip the data
 import os                                       # import library to allow deletion of files
@@ -111,6 +112,14 @@ else:
 #####################################################################
 ################# Load all CSV files for ML input ###################
 #####################################################################
+
+##################### BIAGIO VERSION TEST ###########################
+
+
+
+
+
+
 cosmic2MlInputArray = GMM.loadCSVData('../FYP_pixelArrayCSV')
 
 cosmic2MlInputArrayPCA = GMM.dataPCA(cosmic2MlInputArray, 51)
