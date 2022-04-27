@@ -1,6 +1,7 @@
 # include required files
 from cgi import test
 import csv
+from pickle import FALSE
 import pandas as pd                             # pandas to recover pandas data frames from csv files
 import numpy as np                              # numpy for data manipulation to ML  model
 from pathlib import Path                        # to iterate over all files in folder
@@ -12,6 +13,13 @@ from sklearn import metrics
 from sklearn.preprocessing import MinMaxScaler, StandardScaler, normalize
 from sklearn.impute import SimpleImputer
 from yellowbrick.cluster import SilhouetteVisualizer
+from datetime import datetime, date
+import os
+import urllib.request                           # import library to web scrape the data download
+import tarfile                                  # import library to unzip the data
+import Import_Cosmic_Data as Data               # import the data script to get data
+import PreProcess_Cosmic_Data as PrePro         # import the pre-processing script to process data
+import Processed_Cosmic_Data as Pros            # import the processed data script to produce CSV files
 
 
 #####################################################################
@@ -81,7 +89,7 @@ def dataOptimalClusterNumber(cosmic2MlInputArrayPCA):
         # repeat for 10 itterations of each cluster size given random initialisation
         for iteration in range(10):
             # create GMM instance for different number of clusters
-            gmm = GaussianMixture(n_components=clusters). fit(cosmic2MlInputArrayPCA)                       # initialise the GMM model
+            gmm = GaussianMixture(n_components=clusters).fit(cosmic2MlInputArrayPCA)                       # initialise the GMM model
             predictions = gmm.predict(cosmic2MlInputArrayPCA)                                               # predict for each value its cluster membership
             silhouette = metrics.silhouette_score(cosmic2MlInputArrayPCA, predictions, metric='euclidean')  # obtain silhouette score for the predictions
             temporarySilhouetteHolder.append(silhouette)                # store temporerily each itteration                                                 
@@ -110,78 +118,100 @@ def dataOptimalClusterNumber(cosmic2MlInputArrayPCA):
 #####################################################################
 ##################### Predict Specific Hour #########################
 #####################################################################
-def predictHourWithGMM(inputArrayAsList):
-    print('Loading Data Into ML Model...')
-    inputArray = np.array(inputArrayAsList)
-    GMM = GaussianMixture(n_components=3, random_state=0).fit(inputArray)
-    testPredict = inputArray[0].reshape(1, -1)
-    print(GMM.predict_proba(testPredict))
+def predictHourWithGMM(year, day, month, hour, cosmic2MlInputArrayPCA):
+    print(f'Generating Predictions for year:{year}, month:{month}, day:{day}, hour:{hour}')
+    
+    # Get day of year for required Data download
+    dayOfYear = date(year, month, day).timetuple().tm_yday
 
-    # Standardize data
-    scaler = StandardScaler() 
-    scaled_inputArray = scaler.fit_transform(inputArray) 
-  
-    # Normalizing the Data 
-    normalized_inputArray = normalize(scaled_inputArray) 
+    # Check if years CSV files already exist
+    if os.path.isfile(f'../FYP_pixelArrayCSV/{year}_{month}_{day}_{hour}.csv') == FALSE:
+        print('CSV file for predicted day does not exist - needs generating...')
 
+        # If CSV does not exist check if data from that day is already downloaded, if not - download
+        if os.path.isfile(f'../FYP_Data/podTc2_postProc_{year}_{dayOfYear}') == False:
+            print('Data for predicted day does not exist - needs downloading...')
 
-    normalized_inputArray = pd.DataFrame(normalized_inputArray)
-    pca = PCA(n_components=2)
-    X_principal = pca.fit_transform(normalized_inputArray)
+            # Download the File
+            url = f'https://data.cosmic.ucar.edu/gnss-ro/cosmic2/postProc/level1b/2020/{day:03d}/podTc2_postProc_2020_{day:03d}.tar.gz' # url to download with variable day
+            downloaded_filename = f'../FYP_Data/podTc2_postProc_{year}_{day:03d}.tar.gz'                                                  # name and location of downloaded file
+            urllib.request.urlretrieve(url, downloaded_filename)                                                                        # curl to download the file
 
-    # Determine amount of variance explained by components
-    print("Total Variance Explained: ", np.sum(pca.explained_variance_ratio_))
+            # Extract the downloaded file
+            fname = f'../FYP_Data/podTc2_postProc_{year}_{day:03d}.tar.gz'        # name of the file to be extracted
+            if fname.endswith("tar.gz"):                                        # so long as ends in correct format perform the extraction
+                tar = tarfile.open(fname, "r:gz")                               # open the tar.gz file
+                tar.extractall(f'../FYP_Data/podTc2_postProc_{year}_{day:03d}')   # extract all to a new folder of same name
+                tar.close()                                                     # close file
+            os.remove(f'../FYP_Data/podTc2_postProc_{year}_{day:03d}.tar.gz')     # delete non-extracted version of the file
+        else:
+            print('Data for predicted day does exist!')
 
-    # Plot the explained variance
-    plt.plot(pca.explained_variance_ratio_)
-    plt.title('Variance Explained by Extracted Componenents')
-    plt.ylabel('Variance')
-    plt.xlabel('Principal Components')
-    plt.show()
+        # Generate CSV file for day
+        #####################################################################
+        #################### Import the COSMIC 2 Data #######################
+        #####################################################################
+        # directory where data is held
+        directoryPath = f'../FYP_Data/podTc2_postProc_{year}_{day:03d}'   # Directory path containing Data
 
+        # Determine number of files to be imported
+        numberOfFiles = Data.getNumFiles(directoryPath)
 
-    X_principal = pd.DataFrame(X_principal)
-    X_principal.columns = ['P1', 'P2']
+        # Import files to Class list for easy data access
+        tecDataList = Data.importDataToClassList(directoryPath, numberOfFiles)
 
-    X_principal.head(2)
-    print(X_principal)
+        #####################################################################
+        ################# Perform Pre Processing on Data ####################
+        #####################################################################
 
-    gmm = GaussianMixture(n_components=3)
-    gmm.fit(X_principal)
-    print(gmm.means_)
+        # Generate moving averages test
+        PrePro.calculateMovingAverages(tecDataList)
 
-    plt.scatter(X_principal['P1'], X_principal['P2'], c = GaussianMixture(n_components=3).fit_predict(X_principal), cmap=plt.cm.winter, alpha=0.6)
-    plt.show()
+        # Generate difference between moving average and Tec Diff
+        PrePro.calculateDelta(tecDataList)
 
-    n_clusters=np.arange(2, 8)
-    sils=[]
-    sils_err=[]
-    iterations=20
-    for n in n_clusters:
-        tmp_sil=[]
-        for _ in range(iterations):
-            gmm=GaussianMixture(n, n_init=2).fit(X_principal) 
-            labels=gmm.predict(X_principal)
-            sil=metrics.silhouette_score(X_principal, labels, metric='euclidean')
-            tmp_sil.append(sil)
-        val=np.mean(SelBest(np.array(tmp_sil), int(iterations/5)))
-        err=np.std(tmp_sil)
-        sils.append(val)
-        sils_err.append(err)
+        # Generate Intersection coordinates
+        PrePro.calculateIntersects(tecDataList)
 
-    plt.errorbar(n_clusters, sils, yerr=sils_err)
-    plt.title("Silhouette Scores", fontsize=20)
-    plt.xticks(n_clusters)
-    plt.xlabel("N. of clusters")
-    plt.ylabel("Score")
-    plt.show()
+        # Generate Intersection Lat and Lons
+        PrePro.calculateIntersecsLatLon(tecDataList)
 
+        #####################################################################
+        ################### Store Final Processed Data ######################
+        #####################################################################
+
+        # Function to run lat lon algorithm and store final data values
+        processedTecDataList = Pros.importProcessedDataToClassList(tecDataList)
+
+        # Generate and Store Pixel Array as CSV for each hour of the day
+        Pros.saveProcessedTecDeltaPixelPerHr(processedTecDataList, '../FYP_pixelArrayCSV/')
+    else:
+        print('CSV file for predicted day does exist!')
+    
+    #####################################################################
+    ################### Load in CSV for prediction ######################
+    #####################################################################
+    print('Loading CSV File for prediction...')
+    # Load in all CSV data
+    cosmic2MlInputArray = loadCSVData('../FYP_pixelArrayCSV')
+    # append specific prediction
+    df = pd.read_csv(f'../FYP_pixelArrayCSV/{year}_{month}_{day}_{hour}.csv')  # read the CSV file in as a pandas data frame
+    # replace any missing NaN values with a 0 as 0 is insignificant to the data
+    imputer = SimpleImputer(strategy='constant')    # use constant replacement default 0
+    imputer.fit(df)                                 # fit to the array 
+    reconstructedDf = imputer.transform(df)         # replace with zeros, and store back in same variable
+    csvData1D = reconstructedDf.flatten(order='C')  # convert to 1D array for correct dimension to ML model input
+    cosmic2MlInputArray.append(csvData1D)           # append numpy array to running list of ML input data
+
+    # perform PCA on all CSV to obtain only 51 dimensions
+    cosmic2MlInputArrayPCA = dataPCA(cosmic2MlInputArray, 51)
+
+    # create GMM instance for prediction
+    gmm = GaussianMixture(n_components=2).fit(cosmic2MlInputArrayPCA)
+    testPredict = cosmic2MlInputArrayPCA[-1].reshape(1, -1)
+    predictionProbs = gmm.predict_proba(testPredict)
+    print(f'Prediction probability of belonging to each cluster: {predictionProbs}')
+    
     return()
 
 
-def SelBest(arr:list, X:int)->list:
-    '''
-    returns the set of X configurations with shorter distance
-    '''
-    dx=np.argsort(arr)[:X]
-    return arr[dx]

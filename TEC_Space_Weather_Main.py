@@ -101,7 +101,7 @@ if len(csvDir) == 0:
         processedTecDataList = Pros.importProcessedDataToClassList(tecDataList)
 
         # Generate and Store Pixel Array as CSV for each hour of the day
-        Pros.saveProcessedTecDeltaPixelPerHr(processedTecDataList)
+        Pros.saveProcessedTecDeltaPixelPerHr(processedTecDataList, '../FYP_pixelArrayCSV/')
 
     print("Progress of CSV Export: 100% - All CSV files with Pixel Data produced for 2020!")
 
@@ -113,11 +113,16 @@ else:
 #####################################################################
 cosmic2MlInputArray = GMM.loadCSVData('../FYP_pixelArrayCSV')
 
-#GMM.trainGMM(cosmic2MlInputArray)
-
 cosmic2MlInputArrayPCA = GMM.dataPCA(cosmic2MlInputArray, 51)
 
-GMM.dataOptimalClusterNumber(cosmic2MlInputArrayPCA)
+#GMM.dataOptimalClusterNumber(cosmic2MlInputArrayPCA)
+
+while(1):
+    year = int(input("Enter Year: "))
+    month = int(input("Enter Month: "))
+    day = int(input("Enter Day: "))
+    hour = int(input("Enter Hour: "))
+    GMM.predictHourWithGMM(year, day, month, hour, cosmic2MlInputArrayPCA)
 
 
 

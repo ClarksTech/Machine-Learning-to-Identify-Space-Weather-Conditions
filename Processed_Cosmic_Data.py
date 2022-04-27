@@ -195,7 +195,7 @@ def populateProcessedTecDeltaPixelPerHr(processedTecDataList, hour):
 #####################################################################
 ######### Function to save TEC delta Pixels per Hr as CSV ###########
 #####################################################################
-def saveProcessedTecDeltaPixelPerHr(processedTecDataList):
+def saveProcessedTecDeltaPixelPerHr(processedTecDataList, savePath):
     # Generate and Store Pixel Array as CSV for each hour of the day
     for hour in range(0, 24, 1):
         progress = hour/23 * 100
@@ -203,6 +203,6 @@ def saveProcessedTecDeltaPixelPerHr(processedTecDataList):
         processedDataPixelArray = populateProcessedTecDeltaPixelPerHr(processedTecDataList, hour)  # get list of lists with pixel array data
         pixelArray = np.array(processedDataPixelArray)                                                  # convert to numpy array for easier manipulation
         # store as CSV file so can be accessed by ML model easiy and generation only needed once
-        pd.DataFrame(pixelArray).to_csv(f'../FYP_pixelArrayCSV/{processedTecDataList[0].utcTime[0].year}_{processedTecDataList[0].utcTime[0].month}_{processedTecDataList[0].utcTime[0].day}_{hour}.csv', index=False)
+        pd.DataFrame(pixelArray).to_csv(f'{savePath}{processedTecDataList[0].utcTime[0].year}_{processedTecDataList[0].utcTime[0].month}_{processedTecDataList[0].utcTime[0].day}_{hour}.csv', index=False)
     print("Progress of Conversion to Pixel CSV files: 100 % - CSV Export Complete")
     return()
