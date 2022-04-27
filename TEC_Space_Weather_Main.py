@@ -113,7 +113,11 @@ else:
 #####################################################################
 cosmic2MlInputArray = GMM.loadCSVData('../FYP_pixelArrayCSV')
 
-GMM.trainGMM(cosmic2MlInputArray)
+#GMM.trainGMM(cosmic2MlInputArray)
+
+cosmic2MlInputArrayPCA = GMM.dataPCA(cosmic2MlInputArray, 51)
+
+GMM.dataOptimalClusterNumber(cosmic2MlInputArrayPCA)
 
 
 
