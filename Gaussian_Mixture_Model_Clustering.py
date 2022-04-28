@@ -202,7 +202,7 @@ def predictHourWithGMM(year, day, month, hour, cosmic2MlInputArrayPCA):
     cosmic2MlInputArray.append(csvData1D)           # append numpy array to running list of ML input data
 
     # perform PCA on all CSV to obtain only 51 dimensions
-    cosmic2MlInputArrayPCA = dataPCA(cosmic2MlInputArray, 51)
+    cosmic2MlInputArrayPCA = dataPCA(cosmic2MlInputArray, 72)
 
     # create GMM instance for prediction
     gmm = GaussianMixture(n_components=2).fit(cosmic2MlInputArrayPCA)
