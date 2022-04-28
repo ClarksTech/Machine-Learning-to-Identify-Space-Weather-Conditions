@@ -35,9 +35,9 @@ def loadCSVData(directoryPath):
         imputer = SimpleImputer(strategy='constant')    # use constant replacement default 0
         imputer.fit(df)                                 # fit to the array 
         reconstructedDf = imputer.transform(df)         # replace with zeros, and store back in same variable
-
         csvData1D = reconstructedDf.flatten(order='C')  # convert to 1D array for correct dimension to ML model input
-        cosmic2CSVDataArray.append(csvData1D)           # append numpy array to running list of ML input data
+        for x in range(len(csvData1D)):
+            cosmic2CSVDataArray.append(csvData1D[x])           # append numpy array to running list of ML input data
 
     print('All CSV Files Successfully Loaded - Data Ready For ML Model!')
     return(cosmic2CSVDataArray) # return list of all input arrays for ML model
@@ -76,6 +76,7 @@ def dataPCA(cosmic2MlInputArrayList, numPCAComponents):
 ############### Determine Best Number of Clusters ###################
 #####################################################################
 def dataOptimalClusterNumber(cosmic2MlInputArrayPCA):
+    cosmic2MlInputArrayPCA = np.array(cosmic2MlInputArrayPCA).reshape(-1, 1)
     numberOfClusters = np.arange(2,8)
     # Empty lists to hold silhouette score and error bars
     silhouettes = []

@@ -116,15 +116,16 @@ else:
 ##################### BIAGIO VERSION TEST ###########################
 
 
-
+#cosmic2MlInputArray = GMM2.loadCSVData('../FYP_pixelArrayCSV')
+#GMM2.dataOptimalClusterNumber(cosmic2MlInputArray)
 
 
 
 cosmic2MlInputArray = GMM.loadCSVData('../FYP_pixelArrayCSV')
 
-cosmic2MlInputArrayPCA = GMM.dataPCA(cosmic2MlInputArray, 51)
+cosmic2MlInputArrayPCA = GMM.dataPCA(cosmic2MlInputArray, 72)
 
-#GMM.dataOptimalClusterNumber(cosmic2MlInputArrayPCA)
+GMM.dataOptimalClusterNumber(cosmic2MlInputArrayPCA)
 
 while(1):
     year = int(input("Enter Year: "))
