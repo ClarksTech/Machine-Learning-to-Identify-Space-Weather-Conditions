@@ -40,7 +40,7 @@ def loadCSVData(directoryPath):
         csvData1D = reconstructedDf.flatten(order='C')  # convert to 1D array for correct dimension to ML model input
 
         # retain only highest 10 pixel values to prevent coverage pattern being most dominant feature
-        nMax = 10
+        nMax = 5
         index = np.argsort(csvData1D)[:-nMax]
         csvData1D[index] = 0
 
