@@ -116,8 +116,12 @@ else:
 ##################### BIAGIO VERSION TEST ###########################
 
 
-#cosmic2MlInputArray = GMM2.loadCSVData('../FYP_pixelArrayCSV')
-#GMM2.dataOptimalClusterNumber(cosmic2MlInputArray)
+cosmic2MlInputArray = GMM2.loadCSVData('../FYP_pixelArrayCSV')
+GMM2.clusterInPixel(cosmic2MlInputArray)
+
+
+cosmic2MlInputArrayPCA = GMM2.dataPCA(cosmic2MlInputArray, 72)
+GMM2.dataOptimalClusterNumber(cosmic2MlInputArrayPCA)
 
 
 

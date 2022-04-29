@@ -1,4 +1,5 @@
 # include required files
+from pickle import FALSE
 import pandas as pd                             # pandas to recover pandas data frames from csv files
 import numpy as np                              # numpy for data manipulation to ML  model
 from pathlib import Path                        # to iterate over all files in folder
@@ -17,6 +18,7 @@ import tarfile                                  # import library to unzip the da
 import Import_Cosmic_Data as Data               # import the data script to get data
 import PreProcess_Cosmic_Data as PrePro         # import the pre-processing script to process data
 import Processed_Cosmic_Data as Pros            # import the processed data script to produce CSV files
+from mpl_toolkits.basemap import Basemap    # Map for plotting global data
 
 
 #####################################################################
@@ -36,8 +38,13 @@ def loadCSVData(directoryPath):
         imputer.fit(df)                                 # fit to the array 
         reconstructedDf = imputer.transform(df)         # replace with zeros, and store back in same variable
         csvData1D = reconstructedDf.flatten(order='C')  # convert to 1D array for correct dimension to ML model input
-        for x in range(len(csvData1D)):
-            cosmic2CSVDataArray.append(csvData1D[x])           # append numpy array to running list of ML input data
+
+        # retain only highest 10 pixel values to prevent coverage pattern being most dominant feature
+        nMax = 10
+        index = np.argsort(csvData1D)[:-nMax]
+        csvData1D[index] = 0
+
+        cosmic2CSVDataArray.append(csvData1D)           # append numpy array to running list of ML input data
 
     print('All CSV Files Successfully Loaded - Data Ready For ML Model!')
     return(cosmic2CSVDataArray) # return list of all input arrays for ML model
@@ -76,7 +83,6 @@ def dataPCA(cosmic2MlInputArrayList, numPCAComponents):
 ############### Determine Best Number of Clusters ###################
 #####################################################################
 def dataOptimalClusterNumber(cosmic2MlInputArrayPCA):
-    cosmic2MlInputArrayPCA = np.array(cosmic2MlInputArrayPCA).reshape(-1, 1)
     numberOfClusters = np.arange(2,8)
     # Empty lists to hold silhouette score and error bars
     silhouettes = []
@@ -202,7 +208,7 @@ def predictHourWithGMM(year, day, month, hour, cosmic2MlInputArrayPCA):
     cosmic2MlInputArray.append(csvData1D)           # append numpy array to running list of ML input data
 
     # perform PCA on all CSV to obtain only 51 dimensions
-    cosmic2MlInputArrayPCA = dataPCA(cosmic2MlInputArray, 51)
+    cosmic2MlInputArrayPCA = dataPCA(cosmic2MlInputArray, 72)
 
     # create GMM instance for prediction
     gmm = GaussianMixture(n_components=2).fit(cosmic2MlInputArrayPCA)
@@ -212,4 +218,53 @@ def predictHourWithGMM(year, day, month, hour, cosmic2MlInputArrayPCA):
     
     return()
 
+#####################################################################
+############ Determine number of class in each pixel ################
+#####################################################################
+def clusterInPixel(cosmic2MlInputArray):
+
+    gmm = GaussianMixture(n_components=2).fit(cosmic2MlInputArray)                       # initialise the GMM model
+    predictions = gmm.predict(cosmic2MlInputArray)                                       # predict for each value its cluster membership
+
+    cluster0 = [0]*72
+    cluster1 = [0]*72
+
+    for x in range(len(cosmic2MlInputArray)):
+        for i in range(len(cosmic2MlInputArray[x])):
+            if cosmic2MlInputArray[x][i] != 0:
+                if predictions[x] == 0:
+                    cluster0[i] +=1
+                else:
+                    cluster1[i] +=1
+    
+    cluster0 = np.array(cluster0)
+    cluster1 = np.array(cluster1)
+
+    print(f'Total number of datapoints in cluster 0: {np.sum(cluster0)}')
+    print(f'Total number of datapoints in cluster 1: {np.sum(cluster1)}')
+
+    cluster0 = np.reshape(cluster0, (4, 18))
+    cluster1 = np.reshape(cluster1, (4, 18))
+
+    ######## DISPLAY HEAT MAP
+
+    map = Basemap(llcrnrlon=-180,llcrnrlat=-40,urcrnrlon=180,urcrnrlat=40)                      # Using basemap as basis for world map
+    map.drawcoastlines()                                                                        # Only add the costal lines to the map for visual refrence
+    map.drawparallels(np.arange(-90,90,30),labels=[1,1,0,1], fontsize=8)                        # Add Longitude lines and degree labels
+    map.drawmeridians(np.arange(-180,180,30),labels=[1,1,0,1], rotation=45, fontsize=8)         # Add latitude lines and degree labels
+
+    map.imshow(cluster0, cmap='hot', interpolation='nearest')
+    plt.title("Heatmap of Cluster 0 distribution on world map", fontsize=20)    # plot title
+    plt.show()
+
+    map = Basemap(llcrnrlon=-180,llcrnrlat=-40,urcrnrlon=180,urcrnrlat=40)                      # Using basemap as basis for world map
+    map.drawcoastlines()                                                                        # Only add the costal lines to the map for visual refrence
+    map.drawparallels(np.arange(-90,90,30),labels=[1,1,0,1], fontsize=8)                        # Add Longitude lines and degree labels
+    map.drawmeridians(np.arange(-180,180,30),labels=[1,1,0,1], rotation=45, fontsize=8)         # Add latitude lines and degree labels
+
+    map.imshow(cluster1, cmap='hot', interpolation='nearest')
+    plt.title("Heatmap of Cluster 1 distribution on world map", fontsize=20)    # plot title
+    plt.show()
+    
+    return()
 
