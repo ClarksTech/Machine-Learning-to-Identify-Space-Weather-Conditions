@@ -50,14 +50,14 @@ class tecData(object):
 #####################################################################
 ####### Count Number of Files to be loaded for progress bar #########
 #####################################################################
-def getNumFiles(directoryPath):
-    paths = Path(directoryPath).glob('**/*.3430_nc')        # Path for all .3430_nc podTEC files
+def getNumFiles(directoryPath, extension):
+    paths = Path(directoryPath).glob(extension)         # Path for all .3430_nc podTEC files
     # Progres bar setup
     numPaths = 0
     # increment counter for every path
     for path in paths:
         numPaths += 1
-    print("Number of Data Files to Import: ", numPaths)     # print total number of files to be loaded
+    print("Number of Data Files to Import: ", numPaths) # print total number of files to be loaded
     return (numPaths)
 
 #####################################################################

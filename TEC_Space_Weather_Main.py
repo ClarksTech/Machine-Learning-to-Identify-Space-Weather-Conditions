@@ -73,7 +73,7 @@ if len(csvDir) == 0:
         directoryPath = f'../FYP_Data/podTc2_postProc_2020_{day:03d}'   # Directory path containing Data
 
         # Determine number of files to be imported
-        numberOfFiles = Data.getNumFiles(directoryPath)
+        numberOfFiles = Data.getNumFiles(directoryPath, '**/*.3430_nc')
 
         # Import files to Class list for easy data access
         tecDataList = Data.importDataToClassList(directoryPath, numberOfFiles)
@@ -113,34 +113,55 @@ else:
 ################# Load all CSV files for ML input ###################
 #####################################################################
 
-##################### BIAGIO VERSION TEST ###########################
-
-
+# Load the CSV files into an input array ready for Gaussian Mixture Model
 cosmic2MlInputArray = GMM2.loadCSVData('../FYP_pixelArrayCSV')
+
+# Perform Silhouette Score to determine Optimal Number of clusters, and visualise them
+GMM2.dataOptimalClusterNumber(cosmic2MlInputArray)
+
+# Using Pixel Histograms verify importance of clusters by plotting as heatmap on world map
 GMM2.clusterInPixel(cosmic2MlInputArray)
 
-
-cosmic2MlInputArrayPCA = GMM2.dataPCA(cosmic2MlInputArray, 72)
-GMM2.dataOptimalClusterNumber(cosmic2MlInputArrayPCA)
-
-
-
-cosmic2MlInputArray = GMM.loadCSVData('../FYP_pixelArrayCSV')
-
-cosmic2MlInputArrayPCA = GMM.dataPCA(cosmic2MlInputArray, 72)
-
-GMM.dataOptimalClusterNumber(cosmic2MlInputArrayPCA)
-
+# Prompt user for input of specific day to predict
 while(1):
     year = int(input("Enter Year: "))
     month = int(input("Enter Month: "))
     day = int(input("Enter Day: "))
     hour = int(input("Enter Hour: "))
-    GMM.predictHourWithGMM(year, day, month, hour, cosmic2MlInputArrayPCA)
+    GMM2.predictHourWithGMM(year, day, month, hour, cosmic2MlInputArray)
 
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#####################################################################
+################# Old Non-Meaningfull GMM Script ####################
+#####################################################################
+#cosmic2MlInputArray = GMM.loadCSVData('../FYP_pixelArrayCSV')
+
+#cosmic2MlInputArrayPCA = GMM.dataPCA(cosmic2MlInputArray, 72)
+
+#GMM.dataOptimalClusterNumber(cosmic2MlInputArrayPCA)
+
+#while(1):
+    #year = int(input("Enter Year: "))
+    #month = int(input("Enter Month: "))
+    #day = int(input("Enter Day: "))
+    #hour = int(input("Enter Hour: "))
+    #GMM.predictHourWithGMM(year, day, month, hour, cosmic2MlInputArrayPCA)
 
 
 
