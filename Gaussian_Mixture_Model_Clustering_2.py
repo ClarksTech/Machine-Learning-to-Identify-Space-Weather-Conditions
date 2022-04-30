@@ -155,6 +155,7 @@ def predictHourWithGMM(year, day, month, hour):
         # If CSV does not exist check if data from that day is already downloaded, if not - download
         if os.path.isfile(f'../FYP_Data/podTc2_postProc_{year}_{dayOfYear:03d}') == False:
             print('Data for predicted day does not exist - needs downloading...')
+            downloadFlag = 1
 
             # Download the File
             url = f'https://data.cosmic.ucar.edu/gnss-ro/cosmic2/nrt/level1b/{year}/{dayOfYear:03d}/podTc2_nrt_{year}_{dayOfYear:03d}.tar.gz'   # url to download with variable day
@@ -171,6 +172,7 @@ def predictHourWithGMM(year, day, month, hour):
             print('Data Downloaded Succesfully!')
         else:
             print('Data for predicted day does exist!')
+            downloadFlag = 0
 
         # Generate CSV file for day
         #####################################################################
@@ -180,7 +182,7 @@ def predictHourWithGMM(year, day, month, hour):
         directoryPath = f'../FYP_Data/podTc2_postProc_{year}_{dayOfYear:03d}'   # Directory path containing Data
 
         # extension depends on year
-        if year == 2020:
+        if year == 2020 and downloadFlag == 0:
             extension = '**/*.3430_nc'
         else:
             extension = '**/*.0001_nc'
@@ -242,9 +244,18 @@ def predictHourWithGMM(year, day, month, hour):
     # create GMM instance for prediction
     gmm = GaussianMixture(n_components=2).fit(cosmic2MlInputArray)   # fit to the training Data
     testPredict = cosmic2MlInputArray[-1].reshape(1, -1)             # Reshape the prediction array to correct dimensions
-    predictionProbs = gmm.predict_proba(testPredict)                    # Predict probability of membership to each cluster
+    predictionProbs = gmm.predict_proba(testPredict)                 # Predict probability of membership to each cluster
 
     print(f'Prediction probability of belonging to each cluster: {predictionProbs}')
+
+    # Display Heat Map with Cluster Prediction
+    map = Basemap(llcrnrlon=-180,llcrnrlat=-40,urcrnrlon=180,urcrnrlat=40)                      # Using basemap as basis for world map
+    map.drawcoastlines()                                                                        # Only add the costal lines to the map for visual refrence
+    map.drawparallels(np.arange(-90,90,30),labels=[1,1,0,1], fontsize=8)                        # Add Longitude lines and degree labels
+    map.drawmeridians(np.arange(-180,180,30),labels=[1,1,0,1], rotation=45, fontsize=8)         # Add latitude lines and degree labels
+    map.imshow(reconstructedDf, cmap='hot', interpolation='nearest')                            # Plot the Heatmap                 
+    plt.title("Heatmap of standard deviation distribution on world map", fontsize=20)           # plot title
+    plt.show()
     
     return()
 
