@@ -63,10 +63,10 @@ def getNumFiles(directoryPath, extension):
 #####################################################################
 #################### Open dataset and access TEC ####################
 #####################################################################
-def importDataToClassList(directoryPath, numPaths):
+def importDataToClassList(directoryPath, numPaths, extension):
     # empty list to store classes for each LEO and PRN
     tecDataList = []
-    paths = Path(directoryPath).glob('**/*.3430_nc')    # Path for all .3430_nc podTEC files
+    paths = Path(directoryPath).glob(extension)    # Path for all .3430_nc podTEC files
 
     # repeat for all files in directory to show variation
     progressCount = 0

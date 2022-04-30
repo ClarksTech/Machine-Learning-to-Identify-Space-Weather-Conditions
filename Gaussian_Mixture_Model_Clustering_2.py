@@ -142,32 +142,33 @@ def dataOptimalClusterNumber(cosmic2MlInputArrayPCA):
 #####################################################################
 ##################### Predict Specific Hour #########################
 #####################################################################
-def predictHourWithGMM(year, day, month, hour, cosmic2MlInputArrayPCA):
+def predictHourWithGMM(year, day, month, hour):
     print(f'Generating Predictions for year:{year}, month:{month}, day:{day}, hour:{hour}...')
     
     # Get day of year for required Data download
     dayOfYear = date(year, month, day).timetuple().tm_yday
 
     # Check if years CSV files already exist
-    if os.path.isfile(f'../FYP_pixelArrayCSV/{year}_{month}_{day}_{hour}.csv') == FALSE:
+    if os.path.isfile(f'../FYP_pixelArrayCSV/{year}_{month}_{day}_{hour}.csv') == False:
         print('CSV file for predicted day does not exist - needs generating...')
 
         # If CSV does not exist check if data from that day is already downloaded, if not - download
-        if os.path.isfile(f'../FYP_Data/podTc2_postProc_{year}_{dayOfYear}') == False:
+        if os.path.isfile(f'../FYP_Data/podTc2_postProc_{year}_{dayOfYear:03d}') == False:
             print('Data for predicted day does not exist - needs downloading...')
 
             # Download the File
-            url = f'https://data.cosmic.ucar.edu/gnss-ro/cosmic2/postProc/level1b/2020/{day:03d}/podTc2_postProc_2020_{day:03d}.tar.gz' # url to download with variable day
-            downloaded_filename = f'../FYP_Data/podTc2_postProc_{year}_{day:03d}.tar.gz'                                                  # name and location of downloaded file
-            urllib.request.urlretrieve(url, downloaded_filename)                                                                        # curl to download the file
+            url = f'https://data.cosmic.ucar.edu/gnss-ro/cosmic2/nrt/level1b/{year}/{dayOfYear:03d}/podTc2_nrt_{year}_{dayOfYear:03d}.tar.gz'   # url to download with variable day
+            downloaded_filename = f'../FYP_Data/podTc2_nrt_{year}_{dayOfYear:03d}.tar.gz'                                                       # name and location of downloaded file
+            urllib.request.urlretrieve(url, downloaded_filename)                                                                                # curl to download the file
 
             # Extract the downloaded file
-            fname = f'../FYP_Data/podTc2_postProc_{year}_{day:03d}.tar.gz'        # name of the file to be extracted
-            if fname.endswith("tar.gz"):                                        # so long as ends in correct format perform the extraction
-                tar = tarfile.open(fname, "r:gz")                               # open the tar.gz file
-                tar.extractall(f'../FYP_Data/podTc2_postProc_{year}_{day:03d}')   # extract all to a new folder of same name
-                tar.close()                                                     # close file
-            os.remove(f'../FYP_Data/podTc2_postProc_{year}_{day:03d}.tar.gz')     # delete non-extracted version of the file
+            fname = f'../FYP_Data/podTc2_nrt_{year}_{dayOfYear:03d}.tar.gz'             # name of the file to be extracted
+            if fname.endswith("tar.gz"):                                                # so long as ends in correct format perform the extraction
+                tar = tarfile.open(fname, "r:gz")                                       # open the tar.gz file
+                tar.extractall(f'../FYP_Data/podTc2_postProc_{year}_{dayOfYear:03d}')   # extract all to a new folder of same name
+                tar.close()                                                             # close file
+            os.remove(f'../FYP_Data/podTc2_nrt_{year}_{dayOfYear:03d}.tar.gz')          # delete non-extracted version of the file
+            print('Data Downloaded Succesfully!')
         else:
             print('Data for predicted day does exist!')
 
@@ -176,13 +177,19 @@ def predictHourWithGMM(year, day, month, hour, cosmic2MlInputArrayPCA):
         #################### Import the COSMIC 2 Data #######################
         #####################################################################
         # directory where data is held
-        directoryPath = f'../FYP_Data/podTc2_postProc_{year}_{day:03d}'   # Directory path containing Data
+        directoryPath = f'../FYP_Data/podTc2_postProc_{year}_{dayOfYear:03d}'   # Directory path containing Data
+
+        # extension depends on year
+        if year == 2020:
+            extension = '**/*.3430_nc'
+        else:
+            extension = '**/*.0001_nc'
 
         # Determine number of files to be imported
-        numberOfFiles = Data.getNumFiles(directoryPath)
+        numberOfFiles = Data.getNumFiles(directoryPath, extension)
 
         # Import files to Class list for easy data access
-        tecDataList = Data.importDataToClassList(directoryPath, numberOfFiles)
+        tecDataList = Data.importDataToClassList(directoryPath, numberOfFiles, extension)
 
         #####################################################################
         ################# Perform Pre Processing on Data ####################
@@ -233,8 +240,8 @@ def predictHourWithGMM(year, day, month, hour, cosmic2MlInputArrayPCA):
     cosmic2MlInputArray.append(csvData1D)           # append numpy array to running list of ML input data
 
     # create GMM instance for prediction
-    gmm = GaussianMixture(n_components=2).fit(cosmic2MlInputArrayPCA)   # fit to the training Data
-    testPredict = cosmic2MlInputArrayPCA[-1].reshape(1, -1)             # Reshape the prediction array to correct dimensions
+    gmm = GaussianMixture(n_components=2).fit(cosmic2MlInputArray)   # fit to the training Data
+    testPredict = cosmic2MlInputArray[-1].reshape(1, -1)             # Reshape the prediction array to correct dimensions
     predictionProbs = gmm.predict_proba(testPredict)                    # Predict probability of membership to each cluster
 
     print(f'Prediction probability of belonging to each cluster: {predictionProbs}')

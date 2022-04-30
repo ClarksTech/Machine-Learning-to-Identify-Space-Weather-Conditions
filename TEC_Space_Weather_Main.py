@@ -72,11 +72,13 @@ if len(csvDir) == 0:
         # directory where data is held
         directoryPath = f'../FYP_Data/podTc2_postProc_2020_{day:03d}'   # Directory path containing Data
 
+        extension = '**/*.3430_nc'
+
         # Determine number of files to be imported
-        numberOfFiles = Data.getNumFiles(directoryPath, '**/*.3430_nc')
+        numberOfFiles = Data.getNumFiles(directoryPath, extension)
 
         # Import files to Class list for easy data access
-        tecDataList = Data.importDataToClassList(directoryPath, numberOfFiles)
+        tecDataList = Data.importDataToClassList(directoryPath, numberOfFiles, extension)
 
         #####################################################################
         ################# Perform Pre Processing on Data ####################
@@ -114,21 +116,22 @@ else:
 #####################################################################
 
 # Load the CSV files into an input array ready for Gaussian Mixture Model
-cosmic2MlInputArray = GMM2.loadCSVData('../FYP_pixelArrayCSV')
+#cosmic2MlInputArray = GMM2.loadCSVData('../FYP_pixelArrayCSV')
 
 # Perform Silhouette Score to determine Optimal Number of clusters, and visualise them
-GMM2.dataOptimalClusterNumber(cosmic2MlInputArray)
+#GMM2.dataOptimalClusterNumber(cosmic2MlInputArray)
 
 # Using Pixel Histograms verify importance of clusters by plotting as heatmap on world map
-GMM2.clusterInPixel(cosmic2MlInputArray)
+#GMM2.clusterInPixel(cosmic2MlInputArray)
 
 # Prompt user for input of specific day to predict
+print('Program Now Ready To Produce Specific Day Predictions!')
 while(1):
     year = int(input("Enter Year: "))
     month = int(input("Enter Month: "))
     day = int(input("Enter Day: "))
     hour = int(input("Enter Hour: "))
-    GMM2.predictHourWithGMM(year, day, month, hour, cosmic2MlInputArray)
+    GMM2.predictHourWithGMM(year, day, month, hour)
 
 
 
