@@ -8,6 +8,7 @@ import Gaussian_Mixture_Model_Clustering_2 as GMM2  # import the machine learnin
 import urllib.request                           # import library to web scrape the data download
 import tarfile                                  # import library to unzip the data
 import os                                       # import library to allow deletion of files
+from sklearn.mixture import GaussianMixture     # GMM macine learning model
 
 #####################################################################
 ####################### Main Program Script #########################
@@ -115,14 +116,15 @@ else:
 ################# Load all CSV files for ML input ###################
 #####################################################################
 
-# Load the CSV files into an input array ready for Gaussian Mixture Model
-#cosmic2MlInputArray = GMM2.loadCSVData('../FYP_pixelArrayCSV')
+# Load in all CSV data and fit to GMM
+cosmic2MlInputArray = GMM2.loadCSVData('../FYP_pixelArrayCSV')
+gmm = GaussianMixture(n_components=2).fit(cosmic2MlInputArray)  # fit to the training Data
 
 # Perform Silhouette Score to determine Optimal Number of clusters, and visualise them
-#GMM2.dataOptimalClusterNumber(cosmic2MlInputArray)
+GMM2.dataOptimalClusterNumber(cosmic2MlInputArray)
 
 # Using Pixel Histograms verify importance of clusters by plotting as heatmap on world map
-#GMM2.clusterInPixel(cosmic2MlInputArray)
+GMM2.clusterInPixel(gmm, cosmic2MlInputArray)
 
 # Prompt user for input of specific day to predict
 print('Program Now Ready To Produce Specific Day Predictions!')
@@ -131,7 +133,7 @@ while(1):
     month = int(input("Enter Month: "))
     day = int(input("Enter Day: "))
     hour = int(input("Enter Hour: "))
-    GMM2.predictHourWithGMM(year, day, month, hour)
+    GMM2.predictHourWithGMM(gmm, year, day, month, hour)
 
 
 

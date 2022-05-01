@@ -108,7 +108,7 @@ def dataOptimalClusterNumber(cosmic2MlInputArrayPCA):
             print("Progress of Silhouette Score: %.2f" %progress, "%",end='\r')
             progressCount += 1
             # create GMM instance for different number of clusters
-            gmm = GaussianMixture(n_components=clusters).fit(cosmic2MlInputArrayPCA)                       # initialise the GMM model
+            gmm = GaussianMixture(n_components=clusters).fit(cosmic2MlInputArrayPCA)                        # initialise the GMM model
             predictions = gmm.predict(cosmic2MlInputArrayPCA)                                               # predict for each value its cluster membership
             silhouette = metrics.silhouette_score(cosmic2MlInputArrayPCA, predictions, metric='euclidean')  # obtain silhouette score for the predictions
             temporarySilhouetteHolder.append(silhouette)                # store temporerily each itteration                                                 
@@ -142,7 +142,7 @@ def dataOptimalClusterNumber(cosmic2MlInputArrayPCA):
 #####################################################################
 ##################### Predict Specific Hour #########################
 #####################################################################
-def predictHourWithGMM(year, day, month, hour):
+def predictHourWithGMM(gmm, year, day, month, hour):
     print(f'Generating Predictions for year:{year}, month:{month}, day:{day}, hour:{hour}...')
     
     # Get day of year for required Data download
@@ -225,10 +225,7 @@ def predictHourWithGMM(year, day, month, hour):
     ################### Load in CSV for prediction ######################
     #####################################################################
     print('Loading CSV File for prediction...')
-    # Load in all CSV data and fit to GMM
-    cosmic2MlInputArray = loadCSVData('../FYP_pixelArrayCSV')
-    gmm = GaussianMixture(n_components=2).fit(cosmic2MlInputArray)  # fit to the training Data
-
+    
     # append specific prediction
     df = pd.read_csv(f'../FYP_Data_Prediction_CSV/{year}_{month}_{day}_{hour}.csv')  # read the CSV file in as a pandas data frame
 
@@ -237,15 +234,15 @@ def predictHourWithGMM(year, day, month, hour):
     imputer.fit(df)                                 # fit to the array 
     reconstructedDf = imputer.transform(df)         # replace with zeros, and store back in same variable
     csvData1D = reconstructedDf.flatten(order='C')  # convert to 1D array for correct dimension to ML model input
-
+    predictionArray = []
     # retain only highest 5 pixel values to prevent coverage pattern being most dominant feature
     nMax = 5
     index = np.argsort(csvData1D)[:-nMax]
     csvData1D[index] = 0
-    cosmic2MlInputArray.append(csvData1D)           # append numpy array to running list of ML input data
+    predictionArray.append(csvData1D)           # append numpy array to running list of ML input data
 
     # create GMM instance for prediction
-    testPredict = cosmic2MlInputArray[-1].reshape(1, -1)            # Reshape the prediction array to correct dimensions
+    testPredict = predictionArray[-1].reshape(1, -1)            # Reshape the prediction array to correct dimensions
     prediction = gmm.predict(testPredict)                           # Predict probability of membership to each cluster
 
     print(f'Prediction of cluster membership for {year}/{month}/{day} hour:{hour} Cluster Identified as: Cluster: {prediction}')
@@ -264,9 +261,8 @@ def predictHourWithGMM(year, day, month, hour):
 #####################################################################
 ############ Determine number of class in each pixel ################
 #####################################################################
-def clusterInPixel(cosmic2MlInputArray):
+def clusterInPixel(gmm, cosmic2MlInputArray):
     print('Determining Coverage Pattern Globally of Each Cluster...')
-    gmm = GaussianMixture(n_components=2).fit(cosmic2MlInputArray)  # initialise the GMM model
     predictions = gmm.predict(cosmic2MlInputArray)                  # predict for each standard deviation array its cluster membership
 
     # Zero Histograms to track which pixels belong to which cluster to validate meaningfullness of clusters
