@@ -149,11 +149,11 @@ def predictHourWithGMM(year, day, month, hour):
     dayOfYear = date(year, month, day).timetuple().tm_yday
 
     # Check if years CSV files already exist
-    if os.path.isfile(f'../FYP_pixelArrayCSV/{year}_{month}_{day}_{hour}.csv') == False:
+    if os.path.isfile(f'../FYP_Data_Prediction_CSV/{year}_{month}_{day}_{hour}.csv') == False:
         print('CSV file for predicted day does not exist - needs generating...')
 
         # If CSV does not exist check if data from that day is already downloaded, if not - download
-        if os.path.isfile(f'../FYP_Data/podTc2_postProc_{year}_{dayOfYear:03d}') == False:
+        if os.path.isdir(f'../FYP_Data/podTc2_postProc_{year}_{dayOfYear:03d}') == False:
             print('Data for predicted day does not exist - needs downloading...')
             downloadFlag = 1
 
@@ -217,7 +217,7 @@ def predictHourWithGMM(year, day, month, hour):
         processedTecDataList = Pros.importProcessedDataToClassList(tecDataList)
 
         # Generate and Store Pixel Array as CSV for each hour of the day
-        Pros.saveProcessedTecDeltaPixelPerHr(processedTecDataList, '../FYP_pixelArrayCSV/')
+        Pros.saveProcessedTecDeltaPixelPerHr(processedTecDataList, '../FYP_Data_Prediction_CSV/')
     else:
         print('CSV file for predicted day does exist!')
     
@@ -225,10 +225,13 @@ def predictHourWithGMM(year, day, month, hour):
     ################### Load in CSV for prediction ######################
     #####################################################################
     print('Loading CSV File for prediction...')
-    # Load in all CSV data
+    # Load in all CSV data and fit to GMM
     cosmic2MlInputArray = loadCSVData('../FYP_pixelArrayCSV')
+    gmm = GaussianMixture(n_components=2).fit(cosmic2MlInputArray)  # fit to the training Data
+
     # append specific prediction
-    df = pd.read_csv(f'../FYP_pixelArrayCSV/{year}_{month}_{day}_{hour}.csv')  # read the CSV file in as a pandas data frame
+    df = pd.read_csv(f'../FYP_Data_Prediction_CSV/{year}_{month}_{day}_{hour}.csv')  # read the CSV file in as a pandas data frame
+
     # replace any missing NaN values with a 0 as 0 is insignificant to the data
     imputer = SimpleImputer(strategy='constant')    # use constant replacement default 0
     imputer.fit(df)                                 # fit to the array 
@@ -242,11 +245,10 @@ def predictHourWithGMM(year, day, month, hour):
     cosmic2MlInputArray.append(csvData1D)           # append numpy array to running list of ML input data
 
     # create GMM instance for prediction
-    gmm = GaussianMixture(n_components=2).fit(cosmic2MlInputArray)   # fit to the training Data
-    testPredict = cosmic2MlInputArray[-1].reshape(1, -1)             # Reshape the prediction array to correct dimensions
-    predictionProbs = gmm.predict_proba(testPredict)                 # Predict probability of membership to each cluster
+    testPredict = cosmic2MlInputArray[-1].reshape(1, -1)            # Reshape the prediction array to correct dimensions
+    prediction = gmm.predict(testPredict)                           # Predict probability of membership to each cluster
 
-    print(f'Prediction probability of belonging to each cluster: {predictionProbs}')
+    print(f'Prediction of cluster membership for {year}/{month}/{day} hour:{hour} Cluster Identified as: Cluster: {prediction}')
 
     # Display Heat Map with Cluster Prediction
     map = Basemap(llcrnrlon=-180,llcrnrlat=-40,urcrnrlon=180,urcrnrlat=40)                      # Using basemap as basis for world map
@@ -254,7 +256,7 @@ def predictHourWithGMM(year, day, month, hour):
     map.drawparallels(np.arange(-90,90,30),labels=[1,1,0,1], fontsize=8)                        # Add Longitude lines and degree labels
     map.drawmeridians(np.arange(-180,180,30),labels=[1,1,0,1], rotation=45, fontsize=8)         # Add latitude lines and degree labels
     map.imshow(reconstructedDf, cmap='hot', interpolation='nearest')                            # Plot the Heatmap                 
-    plt.title("Heatmap of standard deviation distribution on world map", fontsize=20)           # plot title
+    plt.title(f"Heatmap of standard deviation distribution on {year}/{month}/{day} hour:{hour} Cluster Identified as: Cluster {prediction}", fontsize=20)           # plot title
     plt.show()
     
     return()
